@@ -16,4 +16,3 @@ while alive:
   xp = sense()
     </pre>
 </div>
-Edit: I think it's broken in multiple levels. 
