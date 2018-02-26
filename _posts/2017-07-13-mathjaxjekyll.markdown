@@ -10,7 +10,7 @@ I use <a href="https://github.com/hemangsk/Gravity"> this </a>simple jekyll them
 Add to `_layouts/post.html`
 
 {% highlight html %}
-<script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+<script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
 {% endhighlight %}
 
 Add to `_includes/head.html` between the `head` tags
