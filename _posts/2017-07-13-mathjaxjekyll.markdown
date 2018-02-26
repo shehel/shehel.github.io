@@ -5,7 +5,7 @@ title:  "MathJax with Jekyll"
 date:   2017-07-13 01:12:31 +0530
 categories: MathJax with jekyll
 ---
-I use <a href="https://github.com/hemangsk/Gravity">this</a>simple jekyll theme by hemangsk. Amongst several methods floating in the internet, here is what worked for me with kramdown to get latex running with jekyll pages.
+I use <a href="https://github.com/hemangsk/Gravity"> this</a>simple jekyll theme by hemangsk. Amongst several methods floating in the internet, here is what worked for me with kramdown to get latex running with jekyll pages.
 
 Add to `_layouts/post.html`
 
