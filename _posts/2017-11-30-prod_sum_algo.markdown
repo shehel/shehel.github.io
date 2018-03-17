@@ -3,7 +3,7 @@ layout: post
 comments: true
 title:  "Sum Product Algorithm and Graph Factorization"
 date:   2017-11-30 09:45:31 +0530
-categories: graphical modeling
+categories: Graphical Modeling
 
 ---
 This post describes the Sum Product algorithm which is a neat idea that leverages a handful of important theories from across the field and extends towards more complex models. It is a generalization of  Markov Chains, Kalman Filter, Fast Fourier Transform, Forward-Backward algorithm and more. I'm aware that the approach I use may not suite everyone and in that case, please take a look at the reference section for some excellent resources.  
