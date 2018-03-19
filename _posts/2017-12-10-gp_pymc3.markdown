@@ -44,7 +44,9 @@ $$p(x \mid \pi, \Sigma) = (2\pi)^{-k/2}|\Sigma|^{-1/2} \exp\left\{ -\frac{1}{2} 
 
 Gaussians can be applied almost everywhere, not because of Central Limit Theorem and that everything follows a Normal distribution, which is not true since its mostly the case that they follow a distribution close to a gaussian and not exactly a perfect Gaussian. So why bother with a complicated distribution when you can reasonably approximate with a computationally gifted gaussian. Gifted because it has closure under multiplication, linear projection, marginalisation and conditioning. 
 
-The two key properties to remember are Gaussian under marginalisation
+$$x_1 \in \mathbb{R}^p$$
+
+$$x_2 \in \mathbb{R}^q$$
 
 $$p(x_1,x_2) = \mathcal{N}\left(\left[{
 \begin{array}{c}
@@ -54,18 +56,43 @@ $$p(x_1,x_2) = \mathcal{N}\left(\left[{
 }\right], \left[{
 \begin{array}{c}
   {\Sigma_{11}} & {\Sigma_{12}}  \\
-  {\Sigma_{21}^T} & {\Sigma_{22}}  \\
+  {\Sigma_{12}^T} & {\Sigma_{2}}  \\
 \end{array}
 }\right]\right)$$
 
-$$p(x_1) = \int p(x_1,x_2) dx_2 = \mathcal{N}(\mu_1, \Sigma_1) \label{marginal} \tag{1}$$
+Assume we have a joint distribution as defined above. Note that we are using block matrices where $\Sigma$ is a $n*n$ matrix where $n=p+q$. The two key properties to remember are Gaussian under conditioning
+
+$$p(x_1 \mid x_2) = \mathcal{N}(\mu_1 + \Sigma_{12}\Sigma_2^{-1}(x_2-\mu_2), 
+\Sigma_1-\Sigma_{12}\Sigma_2^{-1}\Sigma_{12}^T) \label{conditioning} \tag{1}$$
+
+This can be derived by rewriting the joint as 
+
+$$p(x_1, x_2) = p(x_1\mid x_2)p(x_2)$$ 
+
+and simply dropping the second term. An obstacle is the inversion of $\Sigma$. We can make use of the <a href="http://www.cis.upenn.edu/~jean/schur-comp.pdf">Schur compliment</a> to obtain the following factorisation for $\Sigma^{-1}$
+
+$$\begin{bmatrix}
+I & O \\
+-\Sigma_{2}^{-1}\Sigma_{12}^T & I
+\end{bmatrix}
+\begin{bmatrix}
+(\Sigma_{11}-\Sigma_{12}\Sigma_{2}^{-1}\Sigma_{21}^T)^{-1} & O \\
+O & \Sigma_{2}^{-1}
+\end{bmatrix}
+\begin{bmatrix}
+I & -\Sigma_{12}\Sigma_{2}^{-1} \\
+O & I
+\end{bmatrix}$$
+
+The covariance of the new conditional Gaussian is the Schur compliment $(\Sigma_{11}-\Sigma_{12}\Sigma_{2}^{-1}\Sigma_{12}^T)^{-1}$. The mean can be obtained by matrix multiplication of the outer terms and splitting into two Gaussians, one for $p(x_1\mid x_2)$ and the other for $p(x_2)$. 
+
+And Gaussian under marginalisation
+
+$$p(x_1) = \int p(x_1,x_2) dx_2 = \mathcal{N}(\mu_1, \Sigma_1) \label{marginal} \tag{2}$$
 
 $$p(x_2) = \int p(x_1,x_2) dx_1 = \mathcal{N}(\mu_2, \Sigma_2)$$
 
-and Gaussian under conditioning
-
-$$p(x_1 \mid x_2) = \mathcal{N}(\mu_1 + \Sigma_{12}\Sigma_2^{-1}(x_2-\mu_2), 
-\Sigma_1-\Sigma_{12}\Sigma_2^{-1}\Sigma_{12}^T) \label{conditioning} \tag{2}$$
+which can be derived by marginalizing over $x_1$, we can pull the second exponential term $p(x_2)$ outside the integral, and the first term is just the density of a Gaussian distribution, so it integrates to 1 and we are left with a trivial marginal. 
 
 <h2>Gaussian Process</h2> 
 Think of Gaussian process as a method that allows the data to speak for itself rather than external forces controlling the hyperparameters(complexity), which essentially allows the model to learn complex functions as more data becomes available. A Gaussian process generalizes the multivariate normal to infinite dimension. It is defined as an infinite collection of random variables, any finite subset of which have a Gaussian distribution. While a probability distribution describes random vectors, a process describes functions. Marginalisation property \ref{marginal} of Gaussians is the reason why we can go infinite. Thus, each of our datapoints are dimensions of a multivariate Gaussian. Following the logic, we can marginalize over the infinitely-many variables we are not interested in to find the value of the variable we actually need. 
@@ -154,16 +181,19 @@ We also have a major constraint with GPs in that it requires the inversion of $K
 PyMC also provides a `gp.Latent` method that has a more general implementation of a GP. You can relax the assumption that the data is normally distributed and work with other distributions. But I couldn't think of a problem where this would work better than regular GPs. 
 
 <h2>Summary</h2>
-The goal of this post was to introduce a very powerful non-parametric technique to reason about data. We went over the key ingredient of GPs, closure properties of Gaussians and used the knowledge to apply it to a regression problem using PyMC python library. We also went over inferring hyperparameters of a GP using the marginal likelihood method. Thus, we were able to fit a curve/line to a dataset without overfitting. 
+The goal of this post was to introduce a very powerful non-parametric technique to reason about data. We went over the key ingredient of GPs, closure properties of Gaussians and methods of deriving it, finally using the knowledge to apply it to a regression problem using PyMC python library. We also went over inferring hyperparameters of a GP using the marginal likelihood method. Thus, we were able to fit a curve/line to a dataset without overfitting. 
 
 <h2>Next Steps</h2>
 GP is a very mature field of research with a wide variety of practical applications from geostatistics to finding the hyperparameters of neural networks. Thus, we have only seen the tip of the iceberg and I encourage exploring the topic. 
 
-For an immediate follow up task, I would highly recommend finding a dataset and do regression on it using GPs. The more complex the dataset, the better such as large datasets, multidimensional datasets etc. There are several Kernel functions to try out aswell. Another interesting usage is balancing the exploitation-exploration tradeoff in Bayesian Optimisation whereby the model learns optimal choices given mean and uncertainty. Although I made no mention, GPs also found success(to an extent) in classification tasks. Please check the references for pointers. 
+For an immediate follow up task, I would highly recommend finding a dataset and do regression on it using GPs. The more complex the dataset, the better such as large datasets, multidimensional datasets etc. There are several Kernel functions to try out aswell. Another interesting usage is balancing the exploitation-exploration tradeoff in Bayesian Optimisation whereby the model learns optimal choices given mean and uncertainty. Although I made no mention, GPs also found success(to an extent) in classification tasks. If you don't feel too Bayesian, try empirical bayes and/or cross validation for which <a href="http://scikit-learn.org/stable/modules/gaussian_process.html">scikit-learn</a> might be useful.
+
+Please check the references for pointers. 
 
 <h2>References</h2>
 <a href="https://github.com/fonnesbeck/gp_tutorial_pydata">A great practical tutorial series on GP using PYMC</a><br>
 <a href="http://www.gaussianprocess.org/gpml/">The Bible of GP</a><br>
-<a href="https://www.cs.ubc.ca/~murphyk/MLbook/">An allround great book for probabilistic ML by Kevin Murphy</a><br>
+<a href="https://www.cs.ubc.ca/~murphyk/MLbook/">An all round great book for probabilistic ML by Kevin Murphy</a><br>
 <a href="www.inference.org.uk/itprnn/book.pdf
 ">Another great book on Bayesian ML by MacKay</a><br>
+<a href="http://www.cis.upenn.edu/~jean/schur-comp.pdf">Proof of Schur Compliments</a>
