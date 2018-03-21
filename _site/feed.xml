@@ -5,8 +5,8 @@
     <description>hello</description>
     <link>http://localhost:4000/</link>
     <atom:link href="http://localhost:4000/feed.xml" rel="self" type="application/rss+xml"/>
-    <pubDate>Mon, 19 Mar 2018 19:20:37 +0530</pubDate>
-    <lastBuildDate>Mon, 19 Mar 2018 19:20:37 +0530</lastBuildDate>
+    <pubDate>Mon, 19 Mar 2018 19:31:02 +0530</pubDate>
+    <lastBuildDate>Mon, 19 Mar 2018 19:31:02 +0530</lastBuildDate>
     <generator>Jekyll v3.6.2</generator>
     
       <item>
@@ -222,222 +222,177 @@ $$p(\mathcal{M}|y) = \frac{p(y|\mathcal{M}p(\mathcal{M}))}{p(y)}$$
       </item>
     
       <item>
-        <title>Gaussian Processes with PyMC3</title>
-        <description>&lt;p&gt;&lt;b&gt;Gaussian&lt;/b&gt; process(GP) are &lt;b&gt;Bayesian&lt;/b&gt;, &lt;b&gt;non-parametric&lt;/b&gt; models for &lt;b&gt;regression&lt;/b&gt; problems.&lt;/p&gt;
+        <title>Sum Product Algorithm and Graph Factorization</title>
+        <description>&lt;p&gt;This post describes the Sum Product algorithm which is a neat idea that leverages a handful of important theories from across the field and extends towards more complex models. It is a generalization of  Markov Chains, Kalman Filter, Fast Fourier Transform, Forward-Backward algorithm and more. I’m aware that the approach I use may not suite everyone and in that case, please take a look at the reference section for some excellent resources.&lt;/p&gt;
 
-&lt;p&gt;Lets focus on the terms in bold and break it down first. The easiest to tackle is regression which you may already know given that you wanted to know more about Gaussian processes. In the most simplest terms, regression is used to predict continuous values. In our adventures with Gaussian process, we will be working on predicting winning times for olympic events(eg. 100m dash) given an year learning a mapping between the two.&lt;/p&gt;
+&lt;h2&gt;Minimum Minimorum&lt;/h2&gt;
+&lt;p&gt;I assume familiarity with the 2 fundamental rules of probability, the product rule and the sum rule given below and the associated notions of joint distributions and marginals. We will be making extensive use of these.&lt;/p&gt;
 
-&lt;figure&gt;&lt;center&gt;
-&lt;img src=&quot;/assets/100mds.png&quot; alt=&quot;OlympicsDataset&quot; title=&quot;Olympics 100m Mens&quot; /&gt;&lt;/center&gt;
-&lt;/figure&gt;
+&lt;script type=&quot;math/tex; mode=display&quot;&gt;p(X,Y)=p(Y|X)p(X) \label{product} \tag{1}&lt;/script&gt;
 
-&lt;p&gt;Please find the &lt;a href=&quot;https://github.com/shehel/Bayesian_analysis/blob/master/GP_regression.ipynb&quot;&gt;iPython notebook&lt;/a&gt; to accompany this tutorial and check out references for some excellent resources. We will be using the PyMC3 python library for probabilistic programming, i.e., implementing GP.&lt;/p&gt;
+&lt;script type=&quot;math/tex; mode=display&quot;&gt;p(X) = \sum_y p(X,Y) \label{sum} \tag{2}&lt;/script&gt;
 
-&lt;h2&gt;Channeling the Bayesian&lt;/h2&gt;
-&lt;p&gt;The key idea is that all Bayesian answers to questions are desribed in probabilities. And that means, you are handed a distribution of results representing the uncertainty inherent in the problem. Ofcourse, one is free to choose the ‘best’ from this distribution but lets try to understand why thinking like a Bayesian is so natural and institutionalised .&lt;/p&gt;
+&lt;h2&gt;What and Why - Sum Product Algorithm?&lt;/h2&gt;
+&lt;p&gt;It is used for Inference, which is a frequently used word in statistics to mean marginalizing a joint distribution so we can be informed of something that was unknown given the other known variables. 
+An issue with marginalizing a joint is that it quickly becomes intractable, i.e., computationally impossible due to the size of the numbers involved. For instance, say you have a model with 100 binary variables (each variable is 0 or 1) and you are now faced with marginalizing a joint distribution with $2^{100}$ terms. Here we can make a simplifying assumption that our joint distribution is not exactly a general joint but a factorized distribution where each of the factors just depend on a few local variables that are ‘close’ to it. This is the underlying assumption that makes fast inference through Sum Product possible.&lt;/p&gt;
 
-&lt;p&gt;Imagine this, you forgot your watch and would like to know the time in hours. The only source of information is your trusty thermometer and your past experience with correlating thermometer readings to time of the day, it should be obvious that there’s no one to one mapping here - there is some uncertainty. It shows a fairly high reading and immediately you narrow down your answer. But notice that you don’t home in on a single value but a range of value weighted by your past experience - you might think its the afternoon, somewhere between 10:00 and 15:00 with a greater weighting near 12:00 because your past experience has shown you that it corresponded to high temperature readings. If the above described your thought process, congratulations! You have proved you are a bayesian and a human aka &lt;u&gt;not&lt;/u&gt; a flawless all knowing super intelligence. Thinking like a Bayesian, an individual, most likely Thomas Bayes but Richard Price and Laplace are also plausible, codified the notion of updating weightage with evidence through&lt;/p&gt;
+&lt;h2&gt;Factorization&lt;/h2&gt;
+&lt;p&gt;I have been mentioning factors and all it means here is that there’s a different way of specifying joint distribution wherein the function (joint distribution) $p(x_1,…,x_n)$ factors into a product of several local functions each of which only contain a subset of the variables.&lt;/p&gt;
 
-&lt;script type=&quot;math/tex; mode=display&quot;&gt;\underbrace{P(A|B)}_{Posterior} = \frac{\underbrace{P(B|A)}_{Likelihood} * \underbrace{P(B)}_{Prior} }{\underbrace{P(A)}_{Evidence/Marginal Likelihood}}&lt;/script&gt;
+&lt;script type=&quot;math/tex; mode=display&quot;&gt;p(x_1,...,x_n) = \prod_s f_s(X_s)&lt;/script&gt;
 
-&lt;p&gt;Our brains handle regression implicitly but computers require an explicit description of this using weight parameters over inputs, which in our case is temperatures. But you already know this, if not, head to the nearest linear regression tutorial. We are now ready to go infinite parameters.&lt;/p&gt;
+&lt;p&gt;where 
+  $X_s$ is a subset of the variables.&lt;/p&gt;
 
-&lt;h2&gt;Non-parametric == infinite parameters&lt;/h2&gt;
-&lt;p&gt;If you tried to understand ‘Non-parametric’ literally, you are not alone and sorry to dissappoint. As cool as such an idea may sound, its also not a thing yet. Bayesian non-parametric methods do not imply that there are no parameters since probability distributions need parameters, but the number of parameters grow with the size of the dataset. Thus, Bayesian non-parametric models are free birds with infinite parameters.&lt;/p&gt;
+&lt;h2&gt;Factor Graphs&lt;/h2&gt;
+&lt;p&gt;Factorization can be verbosely represented through factor graphs because it makes it explicit by adding additional nodes for factors.&lt;/p&gt;
+&lt;div style=&quot;example&quot;&gt;
+	&lt;pre&gt;
+A factor graph is a bipartite graph that expresses the structure&lt;br /&gt;of the factorization.A factor graph has a variable node for each variable $x_i$,&lt;br /&gt;a factor node for each local function $f_s$, and an edge-connecting variable node&lt;br /&gt;$x_i$ to factor node $f_s$ if and only if $x_i$ is an argument of $f_s$.
+	&lt;/pre&gt;
+&lt;/div&gt;
+&lt;p&gt;An example factorization and its corresponding graph is given below.&lt;/p&gt;
 
-&lt;p&gt;The parametric approach
-has an obvious problem in that we have to decide upon the freedom of the class
-of functions considered; if we are using a model based on a certain class of
-functions (e.g. linear functions) and the target function is not well modelled by
-this class, then the predictions will be poor. We could increase the
-flexibility of the class of functions, but this runs into the danger of overfitting,
-where we can obtain a good fit to the training data, but perform badly when
-making test predictions. The non-parametric approach appears to have a serious problem, in that surely
-there are an uncountably infinite set of possible functions, and how are we
-Gaussian process going to compute with this set in finite time? Lets find out.&lt;/p&gt;
-
-&lt;h2&gt;Come get your Gaussian&lt;/h2&gt;
-
-&lt;script type=&quot;math/tex; mode=display&quot;&gt;p(x \mid \pi, \Sigma) = (2\pi)^{-k/2}|\Sigma|^{-1/2} \exp\left\{ -\frac{1}{2} (x-\mu)^{\prime}\Sigma^{-1}(x-\mu) \right\}&lt;/script&gt;
-
-&lt;p&gt;Gaussians can be applied almost everywhere, not because of Central Limit Theorem and that everything follows a Normal distribution, which is not true since its mostly the case that they follow a distribution close to a gaussian and not exactly a perfect Gaussian. So why bother with a complicated distribution when you can reasonably approximate with a computationally gifted gaussian. Gifted because it has closure under multiplication, linear projection, marginalisation and conditioning.&lt;/p&gt;
-
-&lt;script type=&quot;math/tex; mode=display&quot;&gt;x_1 \in R^p&lt;/script&gt;
-
-&lt;script type=&quot;math/tex; mode=display&quot;&gt;x_2 \in R^q&lt;/script&gt;
-
-&lt;script type=&quot;math/tex; mode=display&quot;&gt;% &lt;![CDATA[
-p(x_1,x_2) = \mathcal{N}\left(\left[{
-\begin{array}{c}
-  {\mu_1}  \\
-  {\mu_2}  \\
-\end{array}
-}\right], \left[{
-\begin{array}{c}
-  {\Sigma_{11}} &amp; {\Sigma_{12}}  \\
-  {\Sigma_{21}^T} &amp; {\Sigma_{22}}  \\
-\end{array}
-}\right]\right) %]]&gt;&lt;/script&gt;
-
-&lt;p&gt;Assume we have a joint distribution as defined above. Note that we are using block matrices because this allows us to use some interesting identities. The two key properties to remember are Gaussian under conditioning&lt;/p&gt;
-
-&lt;script type=&quot;math/tex; mode=display&quot;&gt;p(x_1 \mid x_2) = \mathcal{N}(\mu_1 + \Sigma_{12}\Sigma_2^{-1}(x_2-\mu_2), 
-\Sigma_1-\Sigma_{12}\Sigma_2^{-1}\Sigma_{12}^T) \label{conditioning} \tag{2}&lt;/script&gt;
-
-&lt;table&gt;
-  &lt;tbody&gt;
-    &lt;tr&gt;
-      &lt;td&gt;This can be derived by rewriting the joint $p(x_1, x_2)$ as $p(x_1&lt;/td&gt;
-      &lt;td&gt;x_2)p(x_2)$ and simply dropping the second term. An obstacle is the inversion of $\Sigma$. We can make use of the Schur compliment to obtain the following factorisation for $\Sigma^-1$&lt;/td&gt;
-    &lt;/tr&gt;
-  &lt;/tbody&gt;
-&lt;/table&gt;
-
-&lt;p&gt;\begin{bmatrix}
-I &amp;amp; O &lt;br /&gt;
--\Sigma_{22}^{-1}\Sigma_{21} &amp;amp; I
-\end{bmatrix}
-\begin{bmatrix}
-(\Sigma_{11}-\Sigma_{12}\Sigma_{22}^{-1}\Sigma{21})^{-1} &amp;amp; O &lt;br /&gt;
-O &amp;amp; \Sigma_{22}^{-1}
-\end{bmatrix}
-\begin{bmatrix}
-I &amp;amp; -\Sigma_{12}\Sigma{22}^{-1} &lt;br /&gt;
-O &amp;amp; I
-\end{bmatrix}&lt;/p&gt;
-
-&lt;table&gt;
-  &lt;tbody&gt;
-    &lt;tr&gt;
-      &lt;td&gt;The covariance of the new conditional Gaussian is the Schur compliment $(\Sigma_{11}-\Sigma_{12}\Sigma_{22}^{-1}\Sigma{21})^{-1}$. The mean can be obtained by matrix multiplication of the outer terms and splitting into two Gaussians, one for $p(x_1&lt;/td&gt;
-      &lt;td&gt;x_2)$ and the other for $p(x_2)$.&lt;/td&gt;
-    &lt;/tr&gt;
-  &lt;/tbody&gt;
-&lt;/table&gt;
-
-&lt;p&gt;And Gaussian under marginalisation&lt;/p&gt;
-
-&lt;script type=&quot;math/tex; mode=display&quot;&gt;p(x_1) = \int p(x_1,x_2) dx_2 = \mathcal{N}(\mu_1, \Sigma_1) \label{marginal} \tag{1}&lt;/script&gt;
-
-&lt;script type=&quot;math/tex; mode=display&quot;&gt;p(x_2) = \int p(x_1,x_2) dx_1 = \mathcal{N}(\mu_2, \Sigma_2)&lt;/script&gt;
-
-&lt;p&gt;which can be derived by marginalizing over $x_1$, we can pull the second exponential term $p(x_2)$ outside the integral, and the first term is just the density of a Gaussian distribution, so it integrates to 1 and we are left with a trivial marginal.&lt;/p&gt;
-
-&lt;h2&gt;Gaussian Process&lt;/h2&gt;
-&lt;p&gt;Think of Gaussian process as a method that allows the data to speak for itself rather than external forces controlling the hyperparameters(complexity), which essentially allows the model to learn complex functions as more data becomes available. A Gaussian process generalizes the multivariate normal to infinite dimension. It is defined as an infinite collection of random variables, any finite subset of which have a Gaussian distribution. While a probability distribution describes random vectors, a process describes functions. Marginalisation property \ref{marginal} of Gaussians is the reason why we can go infinite. Thus, each of our datapoints are dimensions of a multivariate Gaussian. Following the logic, we can marginalize over the infinitely-many variables we are not interested in to find the value of the variable we actually need.&lt;/p&gt;
-
-&lt;p&gt;We can describe a Gaussian process as a disribution over functions. Just as a multivariate normal distribution is completely specified by a mean vector and covariance matrix, a GP is fully specified by a mean function and a covariance function:&lt;/p&gt;
-
-&lt;script type=&quot;math/tex; mode=display&quot;&gt;p(x) \sim \mathcal{GP}(m(x), K(x,x^{\prime}))&lt;/script&gt;
-
-&lt;p&gt;A widely used GP takes 0 for mean and uses SE kernel as follows&lt;/p&gt;
-
-&lt;script type=&quot;math/tex; mode=display&quot;&gt;% &lt;![CDATA[
-\begin{aligned}
-m(x) &amp;=0 \\
-K(x,x^{\prime}) &amp;= \theta exp( \frac{-(x_i-x_j)^2}{2l^2})
-\end{aligned} %]]&gt;&lt;/script&gt;
-
-&lt;p&gt;The covariance function(kernel) is a RBF(Radial Basis Function) or SE(Squared Exponential), for which values of $x$ and $x^{\prime}$ that are close together result in values of $K$ closer to 1 and those that are far apart return values closer to zero.&lt;/p&gt;
-
-&lt;p&gt;To clarify things a bit, it is common but by no means necessary to consider GPs with a zero mean function. Most of the learning occurs in the covariance function and specifying a mean which is hard to specify is not necessary.&lt;/p&gt;
-
-&lt;p&gt;RBF is very thoroughly studied concept and $ls$ and $\theta$ are its hyperparameter. The SE(squared exponential) kernel as it is known in the GP community can be thought of as measuring the similarity between $x$ and $x^{\prime}$. The covariance function is calculated among all combination of $x_n$ and $x^{\prime}_n$ and we get a $n*n$ matrix. $ls$ is an interesting variable as it defines the shape of the gaussian shaped SE. A low gamma corresponds to very low tolerance in that an $x^{\prime}_n$ needs to be very close to be considered ‘similar’. $\theta$ is the maximum allowable covariance, kind of acting like a weight on the values.&lt;/p&gt;
-
-&lt;p&gt;Role of $ls$ is illustrated with the plots below. I have chosen $x_n$ to be constant at 0 and $x^{\prime}_n$ range from -5 to 5. From left to right, the plots have $ls$ 10, 0 and 0.1.&lt;/p&gt;
+&lt;script type=&quot;math/tex; mode=display&quot;&gt;p(a, b, c, d, e) = f_1(a, b) f_2(b,c,d) f_3(d, e)&lt;/script&gt;
 
 &lt;figure&gt;&lt;center&gt;
-&lt;img src=&quot;/assets/gammas.png&quot; alt=&quot;gammas&quot; title=&quot;Varying Gammas&quot; /&gt;&lt;/center&gt;
+&lt;img src=&quot;/assets/factorised.png&quot; alt=&quot;factorgraph&quot; title=&quot;
+Factor Graph&quot; /&gt;&lt;/center&gt;
 &lt;/figure&gt;
 
-&lt;p&gt;For a finite number of points, the GP becomes a multivariate normal, with the mean and covariance as the mean functon and covariance function evaluated at those points.&lt;/p&gt;
+&lt;h2&gt;Factor graphs as Expression Trees&lt;/h2&gt;
 
-&lt;p&gt;The behavior of individual realizations from the GP is governed by the covariance function. This function controls both the degree of shrinkage to the mean function and the smoothness of functions sampled from the GP.&lt;/p&gt;
+&lt;p&gt;If the factor graph doesn’t contain cycles, then it can be represented as a tree and computation can be simplified using the distributive law of multiplication - \ref{distributive}. We can view this with a ‘message-passing’ analogy whereby the marginal variable is the ‘product’ of ‘messages’. This idea is made clear in the next section. To convert a function representing $p(x_1,…,x_n)$ to the corresponding expression tree for $p(x_i)$, rearrange the factor graph as a rooted tree with $x_i$ as root.&lt;/p&gt;
 
-&lt;h2&gt;Distribution over Functions&lt;/h2&gt;
-&lt;p&gt;Below is a plot containing 20 &lt;u&gt;functions&lt;/u&gt; sampled from a GP. When we write a function that takes continuous values as inputs, we are essentially specifying an infinte vector that only returns values (indexed by the inputs) when the function is called upon to do so. GPs are non-parametric due to this behaviour and the nice properties of a Gaussian makes this possible. This idea may seem a bit alien and I assure you that the pieces will fall in place when we apply it to a regression problem.&lt;/p&gt;
+&lt;script type=&quot;math/tex; mode=display&quot;&gt;\begin{split}
+\sum_x \sum_y xy = x_1y_1+x_2y_1+x_1y_2+x_2y_2 \\
+= (x_1+x_2)(y_1+y_2) 
+= \sum_x x \sum_y y 
+\end{split} \label{distributive} \tag{3}&lt;/script&gt;
 
+&lt;h2&gt;Algorithm in action&lt;/h2&gt;
+&lt;p&gt;I found that the best way to learn the algorithm was to see it in execution given the basic ingredients we have gathered so far. There are missing pieces which will be explained as it appears.&lt;/p&gt;
+
+&lt;h3&gt;Problem - Find the marginal&lt;/h3&gt;
 &lt;figure&gt;&lt;center&gt;
-&lt;img src=&quot;/assets/gps20.png&quot; alt=&quot;sampled&quot; title=&quot;Sampling from a GP&quot; /&gt;&lt;/center&gt;
+&lt;img src=&quot;/assets/workfac.png&quot; alt=&quot;factorgraph2&quot; title=&quot;
+Factor Graph&quot; /&gt;&lt;/center&gt;
 &lt;/figure&gt;
+&lt;p&gt;The factor graph describes the factorization given&lt;/p&gt;
 
-&lt;h2&gt;Noiseless Regression&lt;/h2&gt;
-&lt;p&gt;Here, we need the other important ingredient for GPs, closure under conditioning of Gaussians. The conditioning formula \ref{conditioning} provides an analytical solution to finding the posterior that depends on inverting a single matrix. In the process of going from our prior to the posterior, we are revising our uncertainties based on where data is present. Applying the equation for data points sampled from a cos function and sampling functions from the posterior GP, we get a plot like below. It shows 500 functions sampled from a GP all of which are reasonable explanations derived from our dataset.&lt;/p&gt;
+&lt;script type=&quot;math/tex; mode=display&quot;&gt;p(a,b,c,d,e) = f_1(a)f_2(b)f_3(a,b,c)f_4(c,d)f_5(c,e) \label{cc} \tag{4}&lt;/script&gt;
 
+&lt;p&gt;And we want to find the marginal $p(c)$. Using \ref{sum}&lt;/p&gt;
+
+&lt;script type=&quot;math/tex; mode=display&quot;&gt;p(c) = \sum_a \sum_b \sum_d \sum_e p(a, b, c, d, e) \label{dd} \tag{5}&lt;/script&gt;
+
+&lt;p&gt;We can represent the factor graph as a tree and this will give us the ground to build an intuition of message passing. Notice that the tree is simply rearranged to reflect our problem of finding $p(c)$.&lt;/p&gt;
 &lt;figure&gt;&lt;center&gt;
-&lt;img src=&quot;/assets/posteriorGP.png&quot; alt=&quot;sampledPosterior&quot; title=&quot;Sampling from a Posterior GP&quot; /&gt;&lt;/center&gt;
+&lt;img src=&quot;/assets/worktree.png&quot; alt=&quot;factorgraphtree&quot; title=&quot;Factor Graph as a Tree&quot; /&gt;&lt;/center&gt;
 &lt;/figure&gt;
 
-&lt;p&gt;The points were different functions see to converge are the observed data, uncertainty happens to be low here. What about the case when there is noise in the data, i.e., in the case when&lt;/p&gt;
+&lt;h3&gt;Message Passing&lt;/h3&gt;
+&lt;p&gt;Using the message passing analogy, picture the marginal as a message comprised of several messages that were gathered along the branches of the tree. Substituting \ref{cc} in \ref{dd}, we get a form that we can start to work on&lt;/p&gt;
 
-&lt;script type=&quot;math/tex; mode=display&quot;&gt;y = f(x) + N(0,\sigma^2)&lt;/script&gt;
+&lt;script type=&quot;math/tex; mode=display&quot;&gt;p(c) = \sum_a \sum_b \sum_d \sum_e f_1(a)f_2(b)f_3(a,b,c)f_4(c,d)f_5(c,e)&lt;/script&gt;
 
-&lt;p&gt;The equations answers itself because remember, $f(x)$ is a gaussian and adding noise which is also a Gaussian is a trivial with normally distributed independent Gaussian variables, it is simply $\sigma^2$ added to $K$. A more nagging question is about the hyperparameters (length scale, $\sigma^2$ etc) we’ve taken for granted, how on Earth do we find them? An analytic solution is  rare because in most cases, a data generating function can’t be modelled neatly with Gaussians everywhere in a heirarchical specification of models. That brings us to the next section on inference and probabilistic programming for estimating hyperparameters.&lt;/p&gt;
+&lt;ol&gt;&lt;li&gt;
+Variable $c$ is composed of 3 messages that it received from each of its neighboring factors. To get the message of a variable node, simply multiply all the incoming messages from neighboring factor nodes.
 
-&lt;h2&gt;Inference&lt;/h2&gt;
-&lt;p&gt;We have 3 methods for finding our hyperparameters at this juncture, the more frequentist Empirical Bayes and Cross Validation or full Bayesian inference of hyperparameters with approximating techniques using PyMC3. You already know where we are headed and I do not pursue the other option here as it is kind of obsolete(imho) now that we have efficient probabilistic techniques. An added benefit is that we can go over the wonderful Occam’s Razor property of Bayesian Models.&lt;/p&gt;
+$$p(c) = m_{f3 \rightarrow c}(c) m_{f4 \rightarrow c}(c) m_{f5 \rightarrow c}(c)$$
 
-&lt;p&gt;We have a dataset of Olympics mens 100m winning times for the past century and would like to infer a patters through fitting a GP. Given below is the result.&lt;/p&gt;
-
-&lt;figure&gt;&lt;center&gt;
-&lt;img src=&quot;/assets/100mgp.png&quot; alt=&quot;OlympicsDatasetGP&quot; title=&quot;Olympics 100m Mens Posterior&quot; /&gt;&lt;/center&gt;
-&lt;/figure&gt;
-
-&lt;p&gt;Occam’s Razor also known  as the “law of parsimony” is the problem solving principle that, when presented with competing hypothetical answers to a problem, one should select the one that makes the fewest assumptions. Imagine this, with our infinitely complex GP, it’s not hard to imagine models that totally overfit with very complicated functions. As seen in the figure above, this doesn’t happen because Occam’s Razor is baked into the Bayes formula, namely the  &lt;a href=&quot;https://www.cs.princeton.edu/courses/archive/fall09/cos597A/papers/MacKay2003-Ch28.pdf&quot;&gt;marginal likelihood term&lt;/a&gt;. This is important for us because inferring hyperparameters essentially boils down to comparing models with different parameters and choosing the ones that explains the data the best. Let’s see the information we have and conclusions we can reach in the bayesian setting -&lt;/p&gt;
+where $m_{x \rightarrow y}(z)$ represents a message sent from node $x$ to node $y$ which is a function of variable $z$ because the other variables have been summed out. &lt;/li&gt;
+&lt;li&gt;A natural question now is what the message in the factor nodes are. Let's go through the first factor. In case you are left wondering how something is the way it is, remember that everything is a combination of \ref{distributive} and \ref{sum}. To initiate messages at leaf nodes, the following rules are used depending on if its a leaf or factor node:
 
 &lt;ul&gt;
-&lt;li&gt;Likelihood term which is the probability of the data given our function $f$ and model description $\mathcal{M}$ which includes the hyperparameters we seek $p(y|f, \mathcal{M})$.&lt;/li&gt;
-&lt;li&gt;A prior $p(f|\mathcal{M})$ over $f$.&lt;/li&gt;
-&lt;li&gt;We now require the posterior over our hyperparameters. This is an example of Hierarchical Bayes and we could go on and on with priors over priors and its neat that we can find posteriors over all of them but that's all encapsulated here in $\mathcal{M}$. Recollect the &lt;b&gt;Marginal Likelihood&lt;/b&gt; which here allows us to get rid(marginalise) of the seemingly infinite $f$.
-
-$$p(y|\mathcal{M}) = \int p(y|f, \mathcal{M})p(f| \mathcal{M})df$$
-
-Both the terms being Gaussian, this is an easy integral.&lt;/li&gt;
-
-&lt;li&gt;We can simply apply the Bayes Theorem to get back our posterior on hyperparameters.
-
-$$p(\mathcal{M}|y) = \frac{p(y|\mathcal{M}p(\mathcal{M}))}{p(y)}$$
-&lt;/li&gt;
+	&lt;li&gt;$m_{x \rightarrow f}(x)=1$ a leaf variable node sends an identity function.
+	&lt;/li&gt;
+	&lt;li&gt;$m_{f \rightarrow x}(x)=f(x)$ a leaf factor node sends a description of the function to its parent
+	&lt;/li&gt;
 &lt;/ul&gt;
-&lt;p&gt;This can all be done with PyMCs &lt;code class=&quot;highlighter-rouge&quot;&gt;gp.marginal_likelihood&lt;/code&gt; method. We can get the predictive posterior by conditioning the new dataset on observed data by using &lt;code class=&quot;highlighter-rouge&quot;&gt;gp.conditional&lt;/code&gt; which we have covered already. There is also a &lt;code class=&quot;highlighter-rouge&quot;&gt;gp.predict&lt;/code&gt; method that takes in data and computes the $y$s given a point.&lt;/p&gt;
 
-&lt;h2&gt;Model Design&lt;/h2&gt;
-&lt;p&gt;The effectiveness of a GP and similarly, the appropriateness of the functions it realizes completely lies with the choice of the covariance kernel. Fortunately, PyMC3 includes a large library of covariance functions to choose from. Furthermore, you can also combine covariance functions to model heterogenous data or even come up with a new shiny kernel of your own.&lt;/p&gt;
+The 'procedure' to evaluate a message send by a factor node:
+&lt;ol&gt;
+	&lt;li&gt;Take product of incoming messages into factor node. 
+	&lt;/li&gt;
+	&lt;li&gt;Multiply by factor associated with the node&lt;/li&gt;
+	&lt;li&gt;Marginalize over all variables associated with incoming messages by pulling out the summations. 
+	&lt;/li&gt;
+&lt;/ol&gt;
+&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;By recursively applying the two rules we have seen, the two incoming messages for $f_3$&lt;/p&gt;
 
-&lt;p&gt;We also have a major constraint with GPs in that it requires the inversion of $K$ when calculating the posterior. This quickly becomes unscaleable when fitting large datasets. A reasonable workaround is building a sparse approximation of the covariance matrix by not creating a full covariance matrix over all $n$ training inputs. This method brings down the complexity from $\mathcal{O}(n^3)$ to $\mathcal{O}(nm^2)$ where $m&amp;lt;n$. Although sparse approximation may reduce the expressiveness of the GP, clever choice of $m$ can potentially rectify this. PyMC has &lt;code class=&quot;highlighter-rouge&quot;&gt;gp.MarginalSparse&lt;/code&gt; that implements sparse approximation for which there’s an example in the accompanying notebook. However, this is an interesting field to follow up on.&lt;/p&gt;
+&lt;script type=&quot;math/tex; mode=display&quot;&gt;m_{a\rightarrow f3}(b) = f_1(a)&lt;/script&gt;
 
-&lt;p&gt;PyMC also provides a &lt;code class=&quot;highlighter-rouge&quot;&gt;gp.Latent&lt;/code&gt; method that has a more general implementation of a GP. You can relax the assumption that the data is normally distributed and work with other distributions. But I couldn’t think of a problem where this would work better than regular GPs.&lt;/p&gt;
+&lt;script type=&quot;math/tex; mode=display&quot;&gt;m_{b \rightarrow f3}(a) = f_2(b)&lt;/script&gt;
+
+&lt;p&gt;Note that the right hand side of both the above equations can be seen as the message from the factor node since variable node simply multiply the messages of factor nodes.And what we are left with is&lt;/p&gt;
+
+&lt;script type=&quot;math/tex; mode=display&quot;&gt;m_{f3 \rightarrow c}(c) = \sum_a f_1(a) \sum_b f_2(b) \Big[ f3(a,b,c) \Big] \label{3-c} \tag{6}&lt;/script&gt;
+
+&lt;p&gt;In the original paper, the authors propose a different notation for equations like above called ‘not-sum’ or summary notation which gives \ref{3-c} the form&lt;/p&gt;
+
+&lt;script type=&quot;math/tex; mode=display&quot;&gt;m_{f3 \rightarrow c}(c) = \sum_{\sim c} f_1(a) f_2(b) f3(a,b,c)&lt;/script&gt;
+
+&lt;div class=&quot;example&quot;&gt;
+&lt;pre&gt;
+Instead of indicating the variables being summed over, we indicate&lt;br /&gt;those variables not being summed over. 
+&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;div style=&quot;example&quot;&gt;
+The Sum-Product Update Rule:
+&lt;pre&gt;
+The message sent from a node $v$ on an edge $c$ is the product of the&lt;br /&gt;local function at $v$(or the unit function if $v$ is a variable node) with&lt;br /&gt;all messages received at $v$ on edges other than $e$, summarized for&lt;br /&gt;the variable associated with $e$.
+
+Variable to local function
+
+$$m_{x \to f} (x) = \prod_{h \in n(x) \backslash \{f\}} m_{h \to x} (x)$$
+
+Local function to variable
+
+$$m_{f \to x} (x) = \sum_{\sim \{x\}} \Big(
+f(X) \prod_{y \in n(f) \backslash \{x\}} m_{y \to f} (y)
+\Big)$$
+
+&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;p&gt;We now know everything required to complete the marginal. Applying the equations above, the final form is&lt;/p&gt;
+
+&lt;script type=&quot;math/tex; mode=display&quot;&gt;p(c) = \sum_{\sim c} \Big(f_1(a) f_2(b) f3(a,b,c) \Big) \sum_{\sim c}\Big(f_4(d)\Big) \sum_{\sim c}\Big(f_5(e)\Big)&lt;/script&gt;
+
+&lt;h2&gt;Marginal for every node&lt;/h2&gt;
+&lt;p&gt;Having done the work of finding a marginal for $p(x)$, and going on to think of calculating the marginal for $p(y)$ both variables in the same factor graph, one might notice redundancies because the sub computations for evaluating messages are the same. We can take advantage of this by picking any node and propagating messages from leaf to the root as shown above and from the root back to the leaf so that every node has seen two messages, caching the evaluations all along. A slight increase in computation but now we have all the marginals.&lt;/p&gt;
 
 &lt;h2&gt;Summary&lt;/h2&gt;
-&lt;p&gt;The goal of this post was to introduce a very powerful non-parametric technique to reason about data. We went over the key ingredient of GPs, closure properties of Gaussians and methods of deriving it, finally using the knowledge to apply it to a regression problem using PyMC python library. We also went over inferring hyperparameters of a GP using the marginal likelihood method. Thus, we were able to fit a curve/line to a dataset without overfitting.&lt;/p&gt;
+&lt;p&gt;Hopefully this post introduced Factor Graphs and Sum Product algorithm and provided an intuition of the ideas. It is essentially a method for exact inference of the marginal given a factorized distribution in an acyclical graph.&lt;/p&gt;
 
 &lt;h2&gt;Next Steps&lt;/h2&gt;
-&lt;p&gt;GP is a very mature field of research with a wide variety of practical applications from geostatistics to finding the hyperparameters of neural networks. Thus, we have only seen the tip of the iceberg and I encourage exploring the topic.&lt;/p&gt;
+&lt;p&gt;I strongly recommend reading the &lt;a href=&quot;http://www.psi.toronto.edu/pubs/2001/frey2001factor.pdf&quot;&gt;original paper&lt;/a&gt; as this post introduced less than half of the paper. It’s very accessible with familiar examples and contains a lot more information including applications.&lt;/p&gt;
 
-&lt;p&gt;For an immediate follow up task, I would highly recommend finding a dataset and do regression on it using GPs. The more complex the dataset, the better such as large datasets, multidimensional datasets etc. There are several Kernel functions to try out aswell. Another interesting usage is balancing the exploitation-exploration tradeoff in Bayesian Optimisation whereby the model learns optimal choices given mean and uncertainty. Although I made no mention, GPs also found success(to an extent) in classification tasks. If you don’t feel too Bayesian, try empirical bayes and/or cross validation for which &lt;a href=&quot;http://scikit-learn.org/stable/modules/gaussian_process.html&quot;&gt;scikit-learn&lt;/a&gt; might be useful.&lt;/p&gt;
+&lt;p&gt;I also avoided talking about cyclic graphs which is where most of the interesting problems lie and the paper discusses interesting ways of working around this with algorithms like Junction Tree and Loopy Belief but you already know everything to understand them.&lt;/p&gt;
 
-&lt;p&gt;Please check the references for pointers.&lt;/p&gt;
+&lt;p&gt;Another avenue for thought is working with continuous variables, i.e., when the messages are intractable. Interesting techniques like Monte Carlo and Variational inference are used in such cases which are whole books worth of content on its own.&lt;/p&gt;
+
+&lt;p&gt;&lt;a href=&quot;https://github.com/ilyakava/sumproduct&quot;&gt;Here&lt;/a&gt; is a nice python implementation of the algorithm for the code savvy learners.&lt;/p&gt;
 
 &lt;h2&gt;References&lt;/h2&gt;
-&lt;p&gt;&lt;a href=&quot;https://github.com/fonnesbeck/gp_tutorial_pydata&quot;&gt;A great practical tutorial series on GP using PYMC&lt;/a&gt;&lt;br /&gt;
-&lt;a href=&quot;http://www.gaussianprocess.org/gpml/&quot;&gt;The Bible of GP&lt;/a&gt;&lt;br /&gt;
-&lt;a href=&quot;https://www.cs.ubc.ca/~murphyk/MLbook/&quot;&gt;An all round great book for probabilistic ML by Kevin Murphy&lt;/a&gt;&lt;br /&gt;
-&lt;a href=&quot;www.inference.org.uk/itprnn/book.pdf &quot;&gt;Another great book on Bayesian ML by MacKay&lt;/a&gt;&lt;br /&gt;&lt;/p&gt;
+&lt;p&gt;&lt;a href=&quot;http://www.psi.toronto.edu/pubs/2001/frey2001factor.pdf&quot;&gt;Factor Graphs and the Sum-Product Algorithm&lt;/a&gt;&lt;br /&gt;
+&lt;a href=&quot;https://www.youtube.com/watch?v=c0AWH5UFyOk&amp;amp;t=3516s&quot;&gt;Christopher Bishop’s presentation video&lt;/a&gt;&lt;br /&gt;
+&lt;a href=&quot;https://github.com/ilyakava/sumproduct&quot;&gt;Ilya’s Sum Product Python implementation&lt;/a&gt;&lt;br /&gt;
+&lt;a href=&quot;https://lipn.univ-paris13.fr/~dovgal/about.html&quot;&gt;Sergey Dovgal’s post&lt;/a&gt;&lt;/p&gt;
+
 </description>
-        <pubDate>Sun, 10 Dec 2017 10:44:31 +0530</pubDate>
-        <link>http://localhost:4000/gaussian/processes/bayesian/non-parametric/pymc3/2017/12/10/prod_sum_algo.html</link>
-        <guid isPermaLink="true">http://localhost:4000/gaussian/processes/bayesian/non-parametric/pymc3/2017/12/10/prod_sum_algo.html</guid>
+        <pubDate>Thu, 30 Nov 2017 09:45:31 +0530</pubDate>
+        <link>http://localhost:4000/graphical/modeling/2017/11/30/prod_sum_algo.html</link>
+        <guid isPermaLink="true">http://localhost:4000/graphical/modeling/2017/11/30/prod_sum_algo.html</guid>
         
         
-        <category>Gaussian</category>
+        <category>Graphical</category>
         
-        <category>Processes</category>
-        
-        <category>Bayesian</category>
-        
-        <category>Non-parametric</category>
-        
-        <category>PyMC3</category>
+        <category>Modeling</category>
         
       </item>
     

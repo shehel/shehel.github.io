@@ -6,9 +6,9 @@ permalink: /about/
 
 <h2>Hello!</h2>
 
-Computer Science graduate with an interest in NLP and Bayesian methods, more so at their intersection. 
+Computer Science graduate with an interest in NLP and Bayesian methods. Hoping to one day apply these to improve knowledge access and transfer.  
 
-Constantly trying to understand and improve this loop at a metalevel. Every bit helps :)  
+Constantly trying to understand this loop.  
 <div class="example">
     <pre>
 while alive:
