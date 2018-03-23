@@ -6,8 +6,8 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
-  <title>Gaussian Processes with PyMC3</title>
-  <meta name="description" content="Gaussian process(GP) are Bayesian, non-parametric models for regression problems.">
+  <title>GP Regression with PyMC3</title>
+  <meta name="description" content="This post will introduce Gaussian process(GP) which are Bayesian non-parametric models, in the context of regression problems.">
   <link href='https://fonts.googleapis.com/css?family=PT+Sans:400,700,400italic,700italic|Source+Sans+Pro:400,700,200,300|Josefin+Sans:400,600,700,300' rel='stylesheet' type='text/css'>
   <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.5.0/css/font-awesome.min.css" rel="stylesheet">
 
@@ -69,14 +69,14 @@
 <article class="post" itemscope itemtype="http://schema.org/BlogPosting">
 
   <header class="post-header">
-    <h1 class="post-title" itemprop="name headline"><a class="post-title-link"  href="/gaussian/processes/bayesian/non-parametric/pymc3/2017/12/10/gp_pymc3.html">Gaussian Processes with PyMC3</a></h1>
+    <h1 class="post-title" itemprop="name headline"><a class="post-title-link"  href="/gaussian/processes/bayesian/non-parametric/pymc3/2017/12/10/gp_pymc3.html">GP Regression with PyMC3</a></h1>
   <center>  <p class="post-meta"><time datetime="2017-12-10T10:44:31+05:30" itemprop="datePublished">Dec 10, 2017</time></p>
     
    </center>
   </header>
 
   <div class="post-content" itemprop="articleBody">
-    <p><b>Gaussian</b> process(GP) are <b>Bayesian</b>, <b>non-parametric</b> models for <b>regression</b> problems.</p>
+    <p>This post will introduce <b>Gaussian</b> process(GP) which are <b>Bayesian</b> <b>non-parametric</b> models, in the context of <b>regression</b> problems.</p>
 
 <p>Lets focus on the terms in bold and break it down first. The easiest to tackle is regression which you may already know given that you wanted to know more about Gaussian processes. In the most simplest terms, regression is used to predict continuous values. In our adventures with Gaussian process, we will be working on predicting winning times for olympic events(eg. 100m dash) given an year learning a mapping between the two.</p>
 

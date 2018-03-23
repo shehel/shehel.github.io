@@ -1,11 +1,11 @@
 ---
 layout: post
 comments: true
-title:  "Gaussian Processes with PyMC3"
+title:  "GP Regression with PyMC3"
 date:   2017-12-10 10:44:31 +0530
 categories: Gaussian Processes Bayesian Non-parametric PyMC3
 ---
-<b>Gaussian</b> process(GP) are <b>Bayesian</b>, <b>non-parametric</b> models for <b>regression</b> problems.
+This post will introduce <b>Gaussian</b> process(GP) which are <b>Bayesian</b> <b>non-parametric</b> models, in the context of <b>regression</b> problems.
 
 Lets focus on the terms in bold and break it down first. The easiest to tackle is regression which you may already know given that you wanted to know more about Gaussian processes. In the most simplest terms, regression is used to predict continuous values. In our adventures with Gaussian process, we will be working on predicting winning times for olympic events(eg. 100m dash) given an year learning a mapping between the two. 
 

@@ -8,7 +8,7 @@ permalink: /about/
 
 Computer Science graduate with an interest in NLP and Bayesian methods. Hoping to one day apply these to improve knowledge access and transfer.  
 
-Constantly trying to understand this loop.  
+Trying to understand this Strange Loop.  
 <div class="example">
     <pre>
 while alive:

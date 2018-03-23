@@ -56,6 +56,9 @@ Attention model with beam search trained on English phonemes to word dataset. Ac
   <li>
     Naive Bayes
   </li>
+   <li>
+    K-means Clustering
+  </li>
 </ul>
   </div>
 </p>

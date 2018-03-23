@@ -554,7 +554,7 @@ pre {
   font-size: 62px;
   text-align: center;
   font-family: "PT Sans";
-  font-weight: 900; }
+  font-weight: 400; }
   @media screen and (max-width: 800px) {
     .post-title {
       font-size: 36px; } }
@@ -563,7 +563,7 @@ pre {
   margin-bottom: 30px;
   padding-bottom: 3em !important; }
   .post-content p {
-    font-size: 1.5rem; }
+    font-size: 1.25rem; }
   .post-content h2 {
     font-size: 32px; }
     @media screen and (max-width: 800px) {

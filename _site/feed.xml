@@ -5,13 +5,13 @@
     <description>hello</description>
     <link>http://localhost:4000/</link>
     <atom:link href="http://localhost:4000/feed.xml" rel="self" type="application/rss+xml"/>
-    <pubDate>Mon, 19 Mar 2018 19:31:02 +0530</pubDate>
-    <lastBuildDate>Mon, 19 Mar 2018 19:31:02 +0530</lastBuildDate>
+    <pubDate>Wed, 21 Mar 2018 13:10:44 +0530</pubDate>
+    <lastBuildDate>Wed, 21 Mar 2018 13:10:44 +0530</lastBuildDate>
     <generator>Jekyll v3.6.2</generator>
     
       <item>
-        <title>Gaussian Processes with PyMC3</title>
-        <description>&lt;p&gt;&lt;b&gt;Gaussian&lt;/b&gt; process(GP) are &lt;b&gt;Bayesian&lt;/b&gt;, &lt;b&gt;non-parametric&lt;/b&gt; models for &lt;b&gt;regression&lt;/b&gt; problems.&lt;/p&gt;
+        <title>GP Regression with PyMC3</title>
+        <description>&lt;p&gt;This post will introduce &lt;b&gt;Gaussian&lt;/b&gt; process(GP) which are &lt;b&gt;Bayesian&lt;/b&gt; &lt;b&gt;non-parametric&lt;/b&gt; models, in the context of &lt;b&gt;regression&lt;/b&gt; problems.&lt;/p&gt;
 
 &lt;p&gt;Lets focus on the terms in bold and break it down first. The easiest to tackle is regression which you may already know given that you wanted to know more about Gaussian processes. In the most simplest terms, regression is used to predict continuous values. In our adventures with Gaussian process, we will be working on predicting winning times for olympic events(eg. 100m dash) given an year learning a mapping between the two.&lt;/p&gt;
 
