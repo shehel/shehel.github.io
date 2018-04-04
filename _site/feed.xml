@@ -5,13 +5,113 @@
     <description>hello</description>
     <link>http://localhost:4000/</link>
     <atom:link href="http://localhost:4000/feed.xml" rel="self" type="application/rss+xml"/>
-    <pubDate>Wed, 21 Mar 2018 13:10:44 +0530</pubDate>
-    <lastBuildDate>Wed, 21 Mar 2018 13:10:44 +0530</lastBuildDate>
+    <pubDate>Wed, 04 Apr 2018 23:58:22 +0530</pubDate>
+    <lastBuildDate>Wed, 04 Apr 2018 23:58:22 +0530</lastBuildDate>
     <generator>Jekyll v3.6.2</generator>
     
       <item>
-        <title>GP Regression with PyMC3</title>
-        <description>&lt;p&gt;This post will introduce &lt;b&gt;Gaussian&lt;/b&gt; process(GP) which are &lt;b&gt;Bayesian&lt;/b&gt; &lt;b&gt;non-parametric&lt;/b&gt; models, in the context of &lt;b&gt;regression&lt;/b&gt; problems.&lt;/p&gt;
+        <title>Uncertainty in Deep Neural Networks</title>
+        <description>&lt;p&gt;Although our world is most probably deterministic, humans by nature operate under imperfect information and uncertainty. And it’s not surprising that we thrive because our biological machinery is so good at dealing with uncertainty helping generate representations of the world that then guide our actions. Quantifying uncertainty is then a reasonable thing to look for in our computational learning models to which we are increasingly offloading decision makings tasks. See AI safety and related case studies if that’s not convincing.&lt;/p&gt;
+
+&lt;p&gt;This will be an ongoing project where I shall try to explore ways of quantifying uncertainty in deep learning models but pardon me when I cut corners because the breadth of the subject is massive. I shall try to compensate this with a thorough reference section. Deep Neural Networks are the models of interest because they have proven to be the state of the art in almost any learning task one can think of. However, its amazing architectural and algorithmic progress has not been consistent with probabilistic models that comes with uncertainty information and all the other benefits of a mathematically elegant formulation. Nevertheless, Bayesian treatment of deep learning(neural network) models has been making a strong comeback since the ‘Golden Era’ in the early ’90s.&lt;/p&gt;
+
+&lt;h2&gt;Classifying Uncertainty&lt;/h2&gt;
+&lt;p&gt;There are different classes of uncertainty and I found that there’s a lack of concensus on the terminology. The wikipedia page on &lt;a href=&quot;https://en.wikipedia.org/wiki/Uncertainty_quantification#Sources_of_uncertainty&quot;&gt;uncertainty quantification&lt;/a&gt; does a good job of describing some of these terms. Kendall and Gal(&lt;a href=&quot;https://arxiv.org/pdf/1703.04977.pdf&quot;&gt;2017&lt;/a&gt;) talk about Epistemic and Aleatoric uncertainty which is sufficient for our purposes although I wish these concepts had less imaginative names.&lt;/p&gt;
+&lt;ul&gt;
+	&lt;li&gt;Aleatoric uncertainty, also referred to as the risk in a task is the uncertainty inherent in the task. For example, sensor data are noisy by nature and this can't be fixed by more data. Ofcourse one could improve the sensor and explain away the uncertainty but then it's also a perfect world.&lt;/li&gt;
+	&lt;li&gt;Epistemic uncertainty, also referred to as the model uncertainty which is usually the uncertainty in the weights of our models. This can be reduced by enough data(parameter uncertainty) and a model with an adequate structure(layers, non-linearities etc) which is able to capture the complexity of the data generating process.&lt;/li&gt;&lt;/ul&gt;
+
+&lt;p&gt;But we can simplify our scope to focus only on the predictive probabilities and its uncertainty which encapsulates both the uncertainties above. This suffices for classification tasks we are about to examine, but may not be the case for reinforcement learning and active learning tasks(&lt;a href=&quot;http://mlg.eng.cam.ac.uk/yarin/blog_3d801aa532c1ce.html&quot;&gt;Gal&lt;/a&gt;). Disentangling the two is a topic I leave for another post, perhaps &lt;a href=&quot;https://towardsdatascience.com/building-a-bayesian-deep-learning-classifier-ece1845bc09&quot;&gt;this&lt;/a&gt;?. The question this post deals with is to assess ways of making deep learning models provide uncertainty estimates. This is important because they can be the pointers to safe and smarter AI.&lt;/p&gt;
+
+&lt;h2&gt;Model&lt;/h2&gt;
+&lt;p&gt;I’ll be sticking to the MNIST dataset for the experiments and they can be reproduced by following the Jupyter notebooks &lt;a href=&quot;https://github.com/shehel/Bayesian_analysis&quot;&gt;here&lt;/a&gt;. The quality of the uncertainty estimates will be evaluated by plotting the predictive distribution using samples from the distribution and out of the distribution using the notMNIST &lt;a href=&quot;https://github.com/davidflanagan/notMNIST-to-MNIST&quot;&gt;dataset&lt;/a&gt;. I will be making use of the entropy of the predictive distribution to evaluate uncertainty represented by a model. We seek a model with low entropy and high accuracy on predictive distribution of MNIST and high entropy on notMNIST. We will be using a very basic CNN as shown in the figure below where outputs of each layer is labelled.&lt;/p&gt;
+
+&lt;figure&gt;&lt;center&gt;
+&lt;img src=&quot;/assets/uncertainty/MNISTarch.png&quot; alt=&quot;CNN&quot; title=&quot;CNN&quot; /&gt;&lt;figcaption&gt;CNN Architecture&lt;/figcaption&gt;
+&lt;/center&gt;
+&lt;/figure&gt;
+
+&lt;p&gt;Since this is a young field of research and my lack of expertise means that I won’t be making strong conclusions from evaluating the methods, unless there’s consensus in the research community.&lt;/p&gt;
+
+&lt;h2&gt;Variational Inference with Edward&lt;/h2&gt;
+&lt;p&gt;Starting with the most Bayesian option, we will be using a probabilistic platform build around Tensorflow called Edward. Edward lets us define probability distributions for variables. Realisations will be samples from the defined distributions and the library also provides algorithms for probabilistic inference. The difficulty with probabilistic models is the several intractable integrals involved in doing inference. Variational Inference(VI) is a method by which Bayesian inference can be recasted as an optimisation problem, so no more impossible integrals.&lt;/p&gt;
+
+&lt;p&gt;In a nutshell, we will be approximating the true posterior $p(\mathbf{w} \vert \mathbf{X, Y})$ with a simpler distribution $q_{\theta}(\mathbf{w})$ parametrised by $\theta$, in our case it will be Gaussians. We will then minimise the Kullback-Leibler(KL), which is a method to calculate ‘distance’ between two ditributions divergence between the true posterior and the approximate posterior. Edward uses the mean-field VI which assumes the variational distribution over the latent variables factorizes as&lt;/p&gt;
+
+&lt;script type=&quot;math/tex; mode=display&quot;&gt;q(w_1, w_2..w_n) = \prod_{j=1}^{n}q(w_j)&lt;/script&gt;
+
+&lt;p&gt;This is a handicap as now our distributions are unimodal and independent between layers which is not true in the case of neural &lt;u&gt;networks&lt;/u&gt; but it helps computation and it scales to an extent. Minimising the KL divergence is still hard, so we need to move the elements around a bit and we obtain an equivalent quantity to maximise, the Evidence Lower Bound(ELBO) which is given by&lt;/p&gt;
+
+&lt;script type=&quot;math/tex; mode=display&quot;&gt;\text{ELBO} = \underbrace{\mathbb{E}_{q_{\theta}}[\log p(\mathbf{x} \vert \mathbf{z})]}_\text{Expected Log Likelihood} - \underbrace{ \text{KL}( q_{\theta}(\mathbf{z}) \| p(\mathbf{z})] }_\text{Prior KL}&lt;/script&gt;
+
+&lt;p&gt;Implementing a Bayesian Neural Network(BNN) is straightforward in Edward. We don’t need a loss function and regularisation comes for free. However, this doesn’t mean that we get back perfect models as we will soon see. To get predictions from a BNN after training, we can draw samples from the weight distributions to get a collection of models and average their predictions to get a point estimate or we could look at the distribution and evaluate the uncertainty.&lt;/p&gt;
+
+&lt;figure&gt;&lt;center&gt;
+&lt;img src=&quot;/assets/uncertainty/50BNN.png&quot; alt=&quot;50PredictiveDistributions&quot; title=&quot;Distribution of Predictive Accruracies - 50&quot; /&gt;&lt;figcaption&gt;Distribution of accuracies of 50 models sampled from posterior&lt;/figcaption&gt;
+&lt;/center&gt;
+&lt;/figure&gt;
+
+&lt;p&gt;Averaging predictions of 50 models gets us to 95% accuracy. Although our model seem to be reaonable with the test set, it’s quite confident with the out of distribution samples as well. The title of the plot contains the test dataset and the mean entropy whereby 0 represents absolute certainty. How come we fall short?&lt;/p&gt;
+
+&lt;figure&gt;&lt;center&gt;
+&lt;img src=&quot;/assets/uncertainty/MNISTvi.png&quot; alt=&quot;EntropyBNN&quot; title=&quot;Predictive Distribution Entropy&quot; /&gt;&lt;figcaption&gt;Entropy of predictive distribution - MNIST and nMNIST&lt;/figcaption&gt;
+&lt;/center&gt;
+&lt;/figure&gt;
+
+&lt;p&gt;Molchanov et al.(&lt;a href=&quot;&quot;&gt;2017&lt;/a&gt;), Trippe and Turner(&lt;a href=&quot;http://approximateinference.org/2017/accepted/TrippeTurner2017.pdf&quot;&gt;2018&lt;/a&gt;) provide compelling evidence of overpruning in mean field variational family. In short, the variability is squashed and the network becomes unable to model uncertainty, therefore variability is traded for sparsity. Trippe and Turner hypothesise that this is due to an unobvious consequence of the ELBO, mean field approximation and balancing modelling the complexity of the data and retaining the simplicity of the prior under this assumption. Note that our approximating distribution which in our case are Gaussians may also not necessarily be anything similar to the true posterior.&lt;/p&gt;
+
+&lt;p&gt;Training on 55,000 images in batches of 128 for 30 epochs took about 14 mins on a 1080Ti, considering it is a minimal CNN, there will be scalability issues with larger CNNs.&lt;/p&gt;
+
+&lt;h2&gt;Monte Carlo(MC) Dropout&lt;/h2&gt;
+&lt;p&gt;Dropout is an empirical techniques used to avoid overfitting in neural networks. It does this by randomly switching off a hidden unit and their connection with a probability to prevent hidden units from co-adapting too much. Gal and Gahrmani(&lt;a href=&quot;http://proceedings.mlr.press/v48/gal16.html&quot;&gt;2015&lt;/a&gt;) shows that approximating ELBO and neural networks with dropout are identical. Therefore, optimising any neural network with dropout resembles some manifestation of approximate Bayesian inference.&lt;/p&gt;
+
+&lt;p&gt;In practice, this means that any neural network can be made to resemble Bayesian inference and this allows us to get predictive mean and uncertainty. This is done by applying dropout during test time as well as training in all layers of the network. Different forward passes will effectively give samples from different models and we can build a predictive distribution from these samples. Below is a plot representing the quality of uncertainty with a model identical to the one we used for VI.&lt;/p&gt;
+
+&lt;figure&gt;&lt;center&gt;
+&lt;img src=&quot;/assets/uncertainty/MCDrop.png&quot; alt=&quot;MCDrop&quot; title=&quot;Simple Transfer&quot; /&gt;
+&lt;figcaption&gt;97.06% accuracy with 0.5 $p$ and 1e-5 L2&lt;/figcaption&gt;&lt;/center&gt;
+&lt;/figure&gt;
+
+&lt;p&gt;The results are slightly better than VI. A possible explanation is the absence of the mean field approximation and we may also be sampling from richer posteriors of weights. But in that case, one can expect much better results. The authors in the MC dropout paper talks about the determinants ofpredictive uncertainty - model structure, model prior and approximating distribution. They identify that the predictive uncertainty depends heavily on the non-linearity and model prior length-scale(equivalent to weight decay). This was proven true when I used ReLu and adjusted the L2 regularisation and dropout probability $p$ and got a somewhat desirable result with 99.3% accuracy(uncertainty plotted below). However that was more ad hocery than I’m comfortable with as techniques to ‘learn’ these hyper parameters should in theory only lead to overfitting and over-confidence(&lt;a href=&quot;https://arxiv.org/pdf/1703.01961&quot;&gt;Louizos and Welling(2017)&lt;/a&gt;). The hyperparameters(from trial and error) for the best result also contradict the fact that 0.5 for $p$ provides the most variance in weights which will translate into greater variance in the predictive distribution (&lt;a href=&quot;https://www.cs.toronto.edu/%7Ehinton/absps/JMLRdropout.pdf&quot;&gt;Srivastava et al.(2014)&lt;/a&gt;). Most of the models in use are ones that are tuned for accuracy and may not perform as well if we ask it for uncertainty estimates. Thus, its another step for the user to search for a model that not only gives good accuracy but also appropriate uncertainty estimates.&lt;/p&gt;
+
+&lt;figure&gt;&lt;center&gt;
+&lt;img src=&quot;/assets/uncertainty/MCDropB.png&quot; alt=&quot;MCDropB&quot; title=&quot;High accuracy(.99) and uncertainty&quot; /&gt;
+&lt;figcaption&gt;High accuracy(99.2%)/confidence on MNIST and low confidence on nMNIST&lt;/figcaption&gt;&lt;/center&gt;
+&lt;/figure&gt;
+
+&lt;p&gt;Note that this is in no way a criticism of MC dropout, it’s simply pointing out gaps in my individual or our collective knowledge. Nevertheless, its also worth pointing out at an actual criticism of the method in a &lt;a href=&quot;http://bayesiandeeplearning.org/2016/papers/BDL_4.pdf&quot;&gt;note&lt;/a&gt; by Ian Osband which raises a confusion between risk and model uncertainty and posits that MC dropout is actually approximating risk which if it is the case, shouldn’t be the uncertainty we should be putting our money on. I feel that MC dropout is as valid as VI in estimating predictive uncertainty from playing around with the two but the question requires more research hours especially into the theoretical aspects to come to a conclusion.&lt;/p&gt;
+
+&lt;h2&gt;Coming up&lt;/h2&gt;
+&lt;p&gt;There are several other exciting methods to uncertainty estimation which includes propositions from the Bayesian paradigm such as Normalizing Flows, Hamiltonian Monte Carlo as well as frequentist methods such as bootstrap sampling, ensembles and more. I’ll update the post irregularly as I get around to exploring the related papers. Given below is a an empirical CDF of the entropy of predictive distributions as done in Louizos and Welling(2017). This should provide a good comparitive picture of the methods implemented so far. Curves that are closer to the bottom right part of the plot are preferable for nMNIST, as it denotes that the probability of observing a high confidence prediction is low and the opposite for MNIST.&lt;/p&gt;
+
+&lt;figure&gt;&lt;center&gt;
+&lt;img src=&quot;/assets/uncertainty/cdf.png&quot; alt=&quot;CDF&quot; title=&quot;Empirical CDF of Entropy&quot; /&gt;
+&lt;figcaption&gt;Empirical CDF of entropy in nMNIST(L) and MNIST(R)&lt;/figcaption&gt;&lt;/center&gt;
+&lt;/figure&gt;
+
+&lt;h2&gt;References&lt;/h2&gt;
+&lt;p&gt;&lt;a href=&quot;https://www.tensorflow.org/versions/r1.1/get_started/mnist/pros#train_and_evaluate_the_model&quot;&gt;Tensorflow MNIST tutorial&lt;/a&gt;&lt;br /&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;a href=&quot;https://www.alpha-i.co/blog/MNIST-for-ML-beginners-The-Bayesian-Way.html&quot;&gt;MLP in Edward Tutorial&lt;/a&gt;&lt;/p&gt;
+</description>
+        <pubDate>Fri, 30 Mar 2018 11:41:31 +0530</pubDate>
+        <link>http://localhost:4000/uncertainty/bayesian/neural/networks/2018/03/30/uncertainty_dl.html</link>
+        <guid isPermaLink="true">http://localhost:4000/uncertainty/bayesian/neural/networks/2018/03/30/uncertainty_dl.html</guid>
+        
+        
+        <category>Uncertainty</category>
+        
+        <category>Bayesian</category>
+        
+        <category>Neural</category>
+        
+        <category>Networks</category>
+        
+      </item>
+    
+      <item>
+        <title>Gaussian Process with PyMC3</title>
+        <description>&lt;p&gt;The goal is to explore &lt;b&gt;Gaussian&lt;/b&gt; process(GP) which are &lt;b&gt;Bayesian&lt;/b&gt; &lt;b&gt;non-parametric&lt;/b&gt; models, in the context of &lt;b&gt;regression&lt;/b&gt; problems.&lt;/p&gt;
 
 &lt;p&gt;Lets focus on the terms in bold and break it down first. The easiest to tackle is regression which you may already know given that you wanted to know more about Gaussian processes. In the most simplest terms, regression is used to predict continuous values. In our adventures with Gaussian process, we will be working on predicting winning times for olympic events(eg. 100m dash) given an year learning a mapping between the two.&lt;/p&gt;
 
@@ -223,7 +323,7 @@ $$p(\mathcal{M}|y) = \frac{p(y|\mathcal{M}p(\mathcal{M}))}{p(y)}$$
     
       <item>
         <title>Sum Product Algorithm and Graph Factorization</title>
-        <description>&lt;p&gt;This post describes the Sum Product algorithm which is a neat idea that leverages a handful of important theories from across the field and extends towards more complex models. It is a generalization of  Markov Chains, Kalman Filter, Fast Fourier Transform, Forward-Backward algorithm and more. I’m aware that the approach I use may not suite everyone and in that case, please take a look at the reference section for some excellent resources.&lt;/p&gt;
+        <description>&lt;p&gt;This post describes the Sum Product algorithm which is a neat idea that leverages a handful of important theories from across the field and extends towards more complex models. I found it to be a very nice method for accessing more complex models and it is infact a generalization of  Markov Chains, Kalman Filter, Fast Fourier Transform, Forward-Backward algorithm and more. I’m aware that the approach I use may not satisfy everyone and in that case, take a look at the reference section for some excellent resources.&lt;/p&gt;
 
 &lt;h2&gt;Minimum Minimorum&lt;/h2&gt;
 &lt;p&gt;I assume familiarity with the 2 fundamental rules of probability, the product rule and the sum rule given below and the associated notions of joint distributions and marginals. We will be making extensive use of these.&lt;/p&gt;

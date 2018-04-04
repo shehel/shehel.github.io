@@ -1,7 +1,7 @@
 ---
 layout: post
 comments: true
-title:  "GP Regression with PyMC3"
+title:  "Gaussian Process with PyMC3"
 date:   2017-12-10 10:44:31 +0530
 categories: Gaussian Processes Bayesian Non-parametric PyMC3
 ---

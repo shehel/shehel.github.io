@@ -6,7 +6,7 @@ date:   2017-11-30 09:45:31 +0530
 categories: Graphical Modeling
 
 ---
-This post describes the Sum Product algorithm which is a neat idea that leverages a handful of important theories from across the field and extends towards more complex models. It is a generalization of  Markov Chains, Kalman Filter, Fast Fourier Transform, Forward-Backward algorithm and more. I'm aware that the approach I use may not suite everyone and in that case, please take a look at the reference section for some excellent resources.  
+This post describes the Sum Product algorithm which is a neat idea that leverages a handful of important theories from across the field and extends towards more complex models. I found it to be a very nice method for accessing more complex models and it is infact a generalization of  Markov Chains, Kalman Filter, Fast Fourier Transform, Forward-Backward algorithm and more. I'm aware that the approach I use may not satisfy everyone and in that case, take a look at the reference section for some excellent resources.  
 
 <h2>Minimum Minimorum</h2>
 I assume familiarity with the 2 fundamental rules of probability, the product rule and the sum rule given below and the associated notions of joint distributions and marginals. We will be making extensive use of these.   
