@@ -5,8 +5,8 @@
     <description>hello</description>
     <link>http://localhost:4000/</link>
     <atom:link href="http://localhost:4000/feed.xml" rel="self" type="application/rss+xml"/>
-    <pubDate>Thu, 05 Apr 2018 19:57:26 +0530</pubDate>
-    <lastBuildDate>Thu, 05 Apr 2018 19:57:26 +0530</lastBuildDate>
+    <pubDate>Fri, 06 Apr 2018 00:21:31 +0530</pubDate>
+    <lastBuildDate>Fri, 06 Apr 2018 00:21:31 +0530</lastBuildDate>
     <generator>Jekyll v3.6.2</generator>
     
       <item>
@@ -26,12 +26,12 @@
 &lt;h2&gt;Methodology&lt;/h2&gt;
 &lt;p&gt;I’ll be sticking to the MNIST dataset for the experiments and they can be reproduced by following the Jupyter notebooks &lt;a href=&quot;https://github.com/shehel/Bayesian_analysis&quot;&gt;here&lt;/a&gt;. The quality of the uncertainty estimates will be evaluated by plotting the predictive distribution using samples from the distribution and out of the distribution using the notMNIST &lt;a href=&quot;https://github.com/davidflanagan/notMNIST-to-MNIST&quot;&gt;dataset&lt;/a&gt;. I will be making use of the entropy of the predictive distribution to evaluate uncertainty represented by a model. We seek a model with low entropy and high accuracy on predictive distribution of MNIST and high entropy on notMNIST. We will be using a very basic CNN as shown in the figure below where outputs of each layer is labelled.&lt;/p&gt;
 
-&lt;p&gt;This project already has a serious problem in that there are no benchmark or metric in my knowledge which  can be used to guide the experiments. Yes, I use two opposing datasets and work towards balancing accuracy and entropy but this approach is akin to walking in the dark. For instance, an adequately complex dataset with the ground truth, in this case like labels of a dataset, we also want some kind of information to verify the ‘approximation quality’/uncertainty of the models but I guess a problem, perhaps simpler than MNIST needs to be modelled almost perfectly to get to that. I mention this because a discussion in NIPS 2016 spoke about Yarin and his thesis where he shows an experiment in which an image(a digit in MNIST) is rotated and the predictions not only vary but also with wild uncertainty estimates. This raises some fundamental questions regarding our approach, how far off are we from a good representation of information?. Nevertheless, I’ll use Yarin’s method for further evaluation and put the results up as model uncertainties get ‘better’. Adverserial samples is another way of testing the robustness of models.&lt;/p&gt;
-
 &lt;figure&gt;&lt;center&gt;
 &lt;img src=&quot;/assets/uncertainty/MNISTarch.png&quot; alt=&quot;CNN&quot; title=&quot;CNN&quot; /&gt;&lt;figcaption&gt;CNN Architecture&lt;/figcaption&gt;
 &lt;/center&gt;
 &lt;/figure&gt;
+
+&lt;p&gt;This project already has a serious problem in that there are no benchmark or metric in my knowledge which  can be used to guide the experiments. Yes, I use two opposing datasets and work towards balancing accuracy and entropy but this approach is akin to walking in the dark. For instance, an adequately complex dataset with the ground truth, in this case like labels of a dataset, we also want some kind of information to verify the ‘approximation quality’/uncertainty of the models but I guess a problem, perhaps simpler than MNIST needs to be modelled almost perfectly to get to that. I mention this because a discussion in NIPS 2016 spoke about Yarin and his thesis where he shows an experiment in which an image(a digit in MNIST) is rotated and the predictions not only vary but also with wild uncertainty estimates. This raises some fundamental questions regarding our approach, how far off are we from a good representation of information?. Nevertheless, I’ll use Yarin’s method for further evaluation and put the results up as model uncertainties get ‘better’. Adverserial samples is another way of testing the robustness of models.&lt;/p&gt;
 
 &lt;p&gt;Since this is a young field of research and my lack of expertise means that I won’t be making strong conclusions from evaluating the methods, unless there’s consensus in the research community.&lt;/p&gt;
 
@@ -117,7 +117,7 @@ computation, Knill and Pouget, 2004&lt;/a&gt;&lt;br /&gt;
         <title>Gaussian Process with PyMC3</title>
         <description>&lt;p&gt;The goal is to explore &lt;b&gt;Gaussian&lt;/b&gt; process(GP) which are &lt;b&gt;Bayesian&lt;/b&gt; &lt;b&gt;non-parametric&lt;/b&gt; models, in the context of &lt;b&gt;regression&lt;/b&gt; problems.&lt;/p&gt;
 
-&lt;p&gt;Focusing on the terms in bold, the easiest to tackle is regression which you may already know given that you wanted to know more about Gaussian processes. In the most simplest terms, regression is used to model and predict continuous values. In our adventure with Gaussian process, we will be working on predicting winning times for olympic events(eg. 100m dash) given an year, learning a mapping between the two.&lt;/p&gt;
+&lt;p&gt;Focusing on the key terms, the easiest to tackle is regression which you may already know given that you wanted to know more about Gaussian processes. In the most simplest terms, regression is used to model and predict continuous values. In our adventure with Gaussian process, we will be working on predicting winning times for olympic events(eg. 100m dash) given an year, learning a mapping between the two.&lt;/p&gt;
 
 &lt;figure&gt;&lt;center&gt;
 &lt;img src=&quot;/assets/100mds.png&quot; alt=&quot;OlympicsDataset&quot; title=&quot;Olympics 100m Mens&quot; /&gt;&lt;/center&gt;
