@@ -7,7 +7,7 @@ categories: Gaussian Processes Bayesian Non-parametric PyMC3
 ---
 The goal is to explore <b>Gaussian</b> process(GP) which are <b>Bayesian</b> <b>non-parametric</b> models, in the context of <b>regression</b> problems.
 
-Focusing on the key terms, the easiest to tackle is regression which you may already know given that you wanted to know more about Gaussian processes. In the most simplest terms, regression is used to model and predict continuous values. In our adventure with Gaussian process, we will be working on predicting winning times for olympic events(eg. 100m dash) given an year, learning a mapping between the two. 
+Focusing on the key terms, the easiest to tackle is regression which you may already know given that you wanted to know more about Gaussian processes. In simple terms, regression is used to model and predict continuous values. In our adventure with Gaussian process, we will be working on predicting winning times for olympic events(eg. 100m dash) given an year, learning a mapping between the two. 
 
 <figure><center>
 <img src="/assets/100mds.png" alt="OlympicsDataset" title="Olympics 100m Mens"></center>
@@ -16,16 +16,16 @@ Focusing on the key terms, the easiest to tackle is regression which you may alr
 Please find the <a href="https://github.com/shehel/Bayesian_analysis/blob/master/GP_regression.ipynb">iPython notebook</a> to accompany this tutorial and check out references for some excellent resources. We will be using the PyMC3 python library for probabilistic programming, i.e., implementing GP.
 
 <h2>Channeling the Bayesian</h2>
-The key idea is that all Bayesian answers to questions are desribed in probabilities. And that means, you are handed a distribution of results representing the uncertainty inherent in the problem. Ofcourse, one is free to choose the 'best' from this distribution but lets try to understand why thinking like a Bayesian is so natural and institutionalised . 
+The key idea is that all Bayesian answers to questions are described in probabilities. And that means, you are handed a distribution of results representing the uncertainty inherent in the problem. Ofcourse, one is free to choose the 'best' from this distribution but let's try to understand why thinking like a Bayesian is so natural and institutionalised . 
 
-Imagine this, you forgot your watch and would like to know the time in hours. The only source of information is your trusty thermometer and your past experience with correlating thermometer readings to time of the day, it should be obvious that there's no one to one mapping here - there is some uncertainty. It shows a fairly high reading and immediately you narrow down your answer. But notice that you don't home in on a single value but a range of value weighted by your past experience - you might think its the afternoon, somewhere between 10:00 and 15:00 with a greater weighting near 12:00 because your past experience has shown you that it corresponded to high temperature readings. If the above described your thought process, congratulations! You have proved you are a bayesian and a human aka <u>not</u> a flawless all knowing super intelligence. Thinking like a Bayesian, an individual, most likely Thomas Bayes but Richard Price and Laplace are also plausible, codified the notion of updating weightage with evidence through
+Imagine this, you forgot your watch and would like to know the time in hours. The only source of information is your trusty thermometer and you experience with correlating thermometer readings to time of the day, it should be obvious that there's no one to one mapping here - there is some uncertainty. It shows a fairly high reading and immediately you narrow down your answer. But notice that you don't home in on a single value but a range of value weighted by your past experience - you might think its the afternoon, somewhere between 10:00 and 15:00 with a greater weighting near 12:00 because your past experience has shown you that it corresponded to high temperature readings. If the above described your thought process, congratulations! You have proved you are a bayesian and a human aka <u>not</u> a flawless all knowing super intelligence. Thinking like a Bayesian, an individual, most likely Thomas Bayes but Richard Price and Laplace are also plausible, codified the notion of updating weightage with evidence through
 
  $$\underbrace{P(A|B)}_{Posterior} = \frac{\underbrace{P(B|A)}_{Likelihood} * \underbrace{P(B)}_{Prior} }{\underbrace{P(A)}_{Evidence/Marginal Likelihood}}$$
 
 Our brains handle regression implicitly but computers require an explicit description of this using weight parameters over inputs, which in our case is temperatures. But you already know this, if not, head to the nearest linear regression tutorial. We are now ready to go infinite parameters. 
 
 <h2>Non-parametric == infinite parameters</h2>
-If you tried to understand 'Non-parametric' literally, you are not alone and sorry to dissappoint. As cool as such an idea may sound, its also not a thing yet. Bayesian non-parametric methods do not imply that there are no parameters since probability distributions need parameters, but the number of parameters grow with the size of the dataset. Thus, Bayesian non-parametric models are free birds with infinite parameters. 
+If you tried to understand 'Non-parametric' literally, you are not alone and sorry to disappoint. As cool as such an idea may sound, it's also not a thing yet. Bayesian non-parametric methods do not imply that there are no parameters since probability distributions need parameters, but the number of parameters grow with the size of the dataset. Thus, Bayesian non-parametric models are free birds with infinite parameters. 
 
 The parametric approach
 has an obvious problem in that we have to decide upon the freedom of the class
@@ -36,7 +36,7 @@ flexibility of the class of functions, but this runs into the danger of overfitt
 where we can obtain a good fit to the training data, but perform badly when
 making test predictions. The non-parametric approach appears to have a serious problem, in that surely
 there are an uncountably infinite set of possible functions, and how are we
-Gaussian process going to compute with this set in finite time? Lets find out. 
+Gaussian process going to compute with this set in finite time? Let's find out. 
 
 <h2>Come get your Gaussian</h2> 
 
@@ -98,7 +98,7 @@ which can be derived by marginalizing over $x_1$, we can pull the second exponen
 Think of Gaussian process as a method that allows the data to speak for itself rather than external forces controlling the hyperparameters(complexity), which essentially allows the model to learn complex functions as more data becomes available. A Gaussian process generalizes the multivariate normal to infinite dimension. It is defined as an infinite collection of random variables, any finite subset of which have a Gaussian distribution. While a probability distribution describes random vectors, a process describes functions. Marginalisation property \ref{marginal} of Gaussians is the reason why we can go infinite. Thus, each of our datapoints are dimensions of a multivariate Gaussian. Following the logic, we can marginalize over the infinitely-many variables we are not interested in to find the value of the variable we actually need. 
 
 
-We can describe a Gaussian process as a disribution over functions. Just as a multivariate normal distribution is completely specified by a mean vector and covariance matrix, a GP is fully specified by a mean function and a covariance function:
+We can describe a Gaussian process as a distribution over functions. Just as a multivariate normal distribution is completely specified by a mean vector and covariance matrix, a GP is fully specified by a mean function and a covariance function:
 
 $$p(x) \sim \mathcal{GP}(m(x), K(x,x^{\prime}))$$
 
@@ -121,12 +121,12 @@ Role of $ls$ is illustrated with the plots below. I have chosen $x_n$ to be cons
 <img src="/assets/gammas.png" alt="gammas" title="Varying Gammas"></center>
 </figure>
 
-For a finite number of points, the GP becomes a multivariate normal, with the mean and covariance as the mean functon and covariance function evaluated at those points.
+For a finite number of points, the GP becomes a multivariate normal, with the mean and covariance as the mean function and covariance function evaluated at those points.
 
 The behavior of individual realizations from the GP is governed by the covariance function. This function controls both the degree of shrinkage to the mean function and the smoothness of functions sampled from the GP.
 
 <h2>Distribution over Functions</h2>
-Below is a plot containing 20 <u>functions</u> sampled from a GP. When we write a function that takes continuous values as inputs, we are essentially specifying an infinte vector that only returns values (indexed by the inputs) when the function is called upon to do so. GPs are non-parametric due to this behaviour and the nice properties of a Gaussian makes this possible. This idea may seem a bit alien and I assure you that the pieces will fall in place when we apply it to a regression problem. 
+Below is a plot containing 20 <u>functions</u> sampled from a GP. When we write a function that takes continuous values as inputs, we are essentially specifying an infinite vector that only returns values (indexed by the inputs) when the function is called upon to do so. GPs are non-parametric due to this behaviour and the nice properties of a Gaussian makes this possible. This idea may seem a bit alien and I assure you that the pieces will fall in place when we apply it to a regression problem. 
 
 <figure><center>
 <img src="/assets/gps20.png" alt="sampled" title="Sampling from a GP"></center>
@@ -143,12 +143,12 @@ The points were different functions see to converge are the observed data, uncer
 
 $$y = f(x) + N(0,\sigma^2)$$
 
-The equations answers itself because remember, $f(x)$ is a gaussian and adding noise which is also a Gaussian is a trivial with normally distributed independent Gaussian variables, it is simply $\sigma^2$ added to $K$. A more nagging question is about the hyperparameters (length scale, $\sigma^2$ etc) we've taken for granted, how on Earth do we find them? An analytic solution is  rare because in most cases, a data generating function can't be modelled neatly with Gaussians everywhere in a heirarchical specification of models. That brings us to the next section on inference and probabilistic programming for estimating hyperparameters. 
+The equations answers itself because remember, $f(x)$ is a gaussian and adding noise which is also a Gaussian is a trivial with normally distributed independent Gaussian variables, it is simply $\sigma^2$ added to $K$. A more nagging question is about the hyperparameters (length scale, $\sigma^2$ etc) we've taken for granted, how on Earth do we find them? An analytic solution is  rare because in most cases, a data generating function can't be modelled neatly with Gaussians everywhere in a hierarchical specification of models. That brings us to the next section on inference and probabilistic programming for estimating hyperparameters. 
 
 <h2>Inference</h2>
 We have 3 methods for finding our hyperparameters at this juncture, the more frequentist Empirical Bayes and Cross Validation or full Bayesian inference of hyperparameters with approximating techniques using PyMC3. You already know where we are headed and I do not pursue the other option here as it is kind of obsolete(imho) now that we have efficient probabilistic techniques. An added benefit is that we can go over the wonderful Occam's Razor property of Bayesian Models. 
 
-We have a dataset of Olympics mens 100m winning times for the past century and would like to infer a patters through fitting a GP. Given below is the result. 
+We have a dataset of Olympics mens 100m winning times for the past century and would like to infer a pattern through fitting a GP. Given below is the result. 
 
 <figure><center>
 <img src="/assets/100mgp.png" alt="OlympicsDatasetGP" title="Olympics 100m Mens Posterior"></center>
@@ -174,9 +174,9 @@ $$p(\mathcal{M}|y) = \frac{p(y|\mathcal{M}p(\mathcal{M}))}{p(y)}$$
 This can all be done with PyMCs `gp.marginal_likelihood` method. We can get the predictive posterior by conditioning the new dataset on observed data by using `gp.conditional` which we have covered already. There is also a `gp.predict` method that takes in data and computes the $y$s given a point.
 
 <h2>Model Design</h2>
-The effectiveness of a GP and similarly, the appropriateness of the functions it realizes completely lies with the choice of the covariance kernel. Fortunately, PyMC3 includes a large library of covariance functions to choose from. Furthermore, you can also combine covariance functions to model heterogenous data or even come up with a new shiny kernel of your own. 
+The effectiveness of a GP and similarly, the appropriateness of the functions it realizes completely lies with the choice of the covariance kernel. Fortunately, PyMC3 includes a large library of covariance functions to choose from. Furthermore, you can also combine covariance functions to model heterogeneous data or even come up with a new shiny kernel of your own. 
 
-We also have a major constraint with GPs in that it requires the inversion of $K$ when calculating the posterior. This quickly becomes unscaleable when fitting large datasets. A reasonable workaround is building a sparse approximation of the covariance matrix by not creating a full covariance matrix over all $n$ training inputs. This method brings down the complexity from $\mathcal{O}(n^3)$ to $\mathcal{O}(nm^2)$ where $m<n$. Although sparse approximation may reduce the expressiveness of the GP, clever choice of $m$ can potentially rectify this. PyMC has `gp.MarginalSparse` that implements sparse approximation for which there's an example in the accompanying notebook. However, this is an interesting field to follow up on. 
+We also have a major constraint with GPs in that it requires the inversion of $K$ when calculating the posterior. This quickly becomes unscalable when fitting large datasets. A reasonable workaround is building a sparse approximation of the covariance matrix by not creating a full covariance matrix over all $n$ training inputs. This method brings down the complexity from $\mathcal{O}(n^3)$ to $\mathcal{O}(nm^2)$ where $m<n$. Although sparse approximation may reduce the expressiveness of the GP, clever choice of $m$ can potentially rectify this. PyMC has `gp.MarginalSparse` that implements sparse approximation for which there's an example in the accompanying notebook. However, this is an interesting field to follow up on. 
 
 PyMC also provides a `gp.Latent` method that has a more general implementation of a GP. You can relax the assumption that the data is normally distributed and work with other distributions. But I couldn't think of a problem where this would work better than regular GPs. 
 

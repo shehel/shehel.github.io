@@ -5,8 +5,8 @@
     <description>hello</description>
     <link>http://localhost:4000/</link>
     <atom:link href="http://localhost:4000/feed.xml" rel="self" type="application/rss+xml"/>
-    <pubDate>Fri, 06 Apr 2018 00:21:31 +0530</pubDate>
-    <lastBuildDate>Fri, 06 Apr 2018 00:21:31 +0530</lastBuildDate>
+    <pubDate>Mon, 09 Apr 2018 13:52:26 +0530</pubDate>
+    <lastBuildDate>Mon, 09 Apr 2018 13:52:26 +0530</lastBuildDate>
     <generator>Jekyll v3.6.2</generator>
     
       <item>
@@ -16,7 +16,7 @@
 &lt;p&gt;This will be an ongoing project where I shall try to explore ways of quantifying uncertainty in deep learning models but pardon me when I cut corners because the breadth of the subject is massive. I shall try to compensate this with a thorough reference section. Deep Neural Networks are the models of interest because they have proven to be the state of the art in almost any learning task one can think of. However, its amazing architectural and algorithmic progress has not been consistent with probabilistic models that comes with uncertainty information and all the other benefits of a mathematically elegant formulation. Nevertheless, Bayesian treatment of deep learning(neural network) models has been making a strong comeback since the ‘Golden Era’ in the early ’90s.&lt;/p&gt;
 
 &lt;h2&gt;Classifying Uncertainty&lt;/h2&gt;
-&lt;p&gt;There are different classes of uncertainty and I found that there’s a lack of concensus on the terminology. The wikipedia page on &lt;a href=&quot;https://en.wikipedia.org/wiki/Uncertainty_quantification#Sources_of_uncertainty&quot;&gt;uncertainty quantification&lt;/a&gt; does a good job of describing some of these terms. Kendall and Gal(&lt;a href=&quot;https://arxiv.org/pdf/1703.04977.pdf&quot;&gt;2017&lt;/a&gt;) talk about Epistemic and Aleatoric uncertainty which is sufficient for our purposes although I wish these concepts had less imaginative names.&lt;/p&gt;
+&lt;p&gt;There are different classes of uncertainty and I found that there’s a lack of consensus on the terminology. The wikipedia page on &lt;a href=&quot;https://en.wikipedia.org/wiki/Uncertainty_quantification#Sources_of_uncertainty&quot;&gt;uncertainty quantification&lt;/a&gt; does a good job of describing some of these terms. Kendall and Gal(&lt;a href=&quot;https://arxiv.org/pdf/1703.04977.pdf&quot;&gt;2017&lt;/a&gt;) talk about Epistemic and Aleatoric uncertainty which is sufficient for our purposes although I wish these concepts had less imaginative names.&lt;/p&gt;
 &lt;ul&gt;
 	&lt;li&gt;Aleatoric uncertainty, also referred to as the risk in a task is the uncertainty inherent in the task. For example, sensor data are noisy by nature and this can't be fixed by more data. Ofcourse one could improve the sensor and explain away the uncertainty but then it's also a perfect world.&lt;/li&gt;
 	&lt;li&gt;Epistemic uncertainty, also referred to as the model uncertainty which is usually the uncertainty in the weights of our models. This can be reduced by enough data(parameter uncertainty) and a model with an adequate structure(layers, non-linearities etc) which is able to capture the complexity of the data generating process.&lt;/li&gt;&lt;/ul&gt;
@@ -31,7 +31,7 @@
 &lt;/center&gt;
 &lt;/figure&gt;
 
-&lt;p&gt;This project already has a serious problem in that there are no benchmark or metric in my knowledge which  can be used to guide the experiments. Yes, I use two opposing datasets and work towards balancing accuracy and entropy but this approach is akin to walking in the dark. For instance, an adequately complex dataset with the ground truth, in this case like labels of a dataset, we also want some kind of information to verify the ‘approximation quality’/uncertainty of the models but I guess a problem, perhaps simpler than MNIST needs to be modelled almost perfectly to get to that. I mention this because a discussion in NIPS 2016 spoke about Yarin and his thesis where he shows an experiment in which an image(a digit in MNIST) is rotated and the predictions not only vary but also with wild uncertainty estimates. This raises some fundamental questions regarding our approach, how far off are we from a good representation of information?. Nevertheless, I’ll use Yarin’s method for further evaluation and put the results up as model uncertainties get ‘better’. Adverserial samples is another way of testing the robustness of models.&lt;/p&gt;
+&lt;p&gt;This project already has a serious problem in that there are no benchmark or metric in my knowledge which  can be used to guide the experiments. Yes, I use two opposing datasets and work towards balancing accuracy and entropy but this approach is akin to walking in the dark. For instance, an adequately complex dataset with the ground truth, in this case like labels of a dataset, we also want some kind of information to verify the ‘approximation quality’/uncertainty of the models but I guess a problem, perhaps simpler than MNIST needs to be modelled almost perfectly to get to that. I mention this because a discussion in NIPS 2016 spoke about Yarin and his thesis where he shows an experiment in which an image(a digit in MNIST) is rotated and the predictions not only vary but also with wild uncertainty estimates. This raises some fundamental questions regarding our approach, how far off are we from a good representation of information?. Nevertheless, I’ll use Yarin’s method for further evaluation and put the results up as model uncertainties get ‘better’. Adversarial samples is another way of testing the robustness of models.&lt;/p&gt;
 
 &lt;p&gt;Since this is a young field of research and my lack of expertise means that I won’t be making strong conclusions from evaluating the methods, unless there’s consensus in the research community.&lt;/p&gt;
 
@@ -53,7 +53,7 @@
 &lt;/center&gt;
 &lt;/figure&gt;
 
-&lt;p&gt;Averaging predictions of 50 models gets us to 95% accuracy. Although our model seem to be reaonable with the test set, it’s quite confident with the out of distribution samples as well. The title of the plot contains the test dataset and the mean entropy whereby 0 represents absolute certainty. How come we fall short?&lt;/p&gt;
+&lt;p&gt;Averaging predictions of 50 models gets us to 95% accuracy. Although our model seem to be reasonable with the test set, it’s quite confident with the out of distribution samples as well. The title of the plot contains the test dataset and the mean entropy whereby 0 represents absolute certainty. How come we fall short?&lt;/p&gt;
 
 &lt;figure&gt;&lt;center&gt;
 &lt;img src=&quot;/assets/uncertainty/MNISTvi.png&quot; alt=&quot;EntropyBNN&quot; title=&quot;Predictive Distribution Entropy&quot; /&gt;&lt;figcaption&gt;Entropy of predictive distribution - MNIST and nMNIST&lt;/figcaption&gt;
@@ -65,7 +65,7 @@
 &lt;p&gt;Training on 55,000 images in batches of 128 for 30 epochs took about 14 mins on a 1080Ti, considering it is a minimal CNN, there will be scalability issues with larger CNNs.&lt;/p&gt;
 
 &lt;h2&gt;Monte Carlo(MC) Dropout&lt;/h2&gt;
-&lt;p&gt;Dropout is an empirical techniques used to avoid overfitting in neural networks. It does this by randomly switching off a hidden unit and their connection with a probability to prevent hidden units from co-adapting too much. Gal and Gahrmani(&lt;a href=&quot;http://proceedings.mlr.press/v48/gal16.html&quot;&gt;2015&lt;/a&gt;) shows that approximating ELBO and neural networks with dropout are identical. Therefore, optimising any neural network with dropout resembles some manifestation of approximate Bayesian inference.&lt;/p&gt;
+&lt;p&gt;Dropout is an empirical technique used to avoid overfitting in neural networks. It does this by randomly switching off a hidden unit and their connection with a probability to prevent hidden units from co-adapting too much. Gal and Gahrmani(&lt;a href=&quot;http://proceedings.mlr.press/v48/gal16.html&quot;&gt;2015&lt;/a&gt;) shows that approximating ELBO and neural networks with dropout are identical. Therefore, optimising any neural network with dropout resembles some manifestation of approximate Bayesian inference.&lt;/p&gt;
 
 &lt;p&gt;In practice, this means that any neural network can be made to resemble Bayesian inference and this allows us to get predictive mean and uncertainty. This is done by applying dropout during test time as well as training in all layers of the network. Different forward passes will effectively give samples from different models and we can build a predictive distribution from these samples. Below is a plot representing the quality of uncertainty with a model identical to the one we used for VI.&lt;/p&gt;
 
@@ -74,7 +74,7 @@
 &lt;figcaption&gt;97.06% accuracy with 0.5 $p$ and 1e-5 L2&lt;/figcaption&gt;&lt;/center&gt;
 &lt;/figure&gt;
 
-&lt;p&gt;The results are slightly better than VI. A possible explanation is the absence of the mean field approximation and we may also be sampling from richer posteriors of weights. But in that case, one can expect much better results. The authors in the MC dropout paper talks about the determinants ofpredictive uncertainty - model structure, model prior and approximating distribution. They identify that the predictive uncertainty depends heavily on the non-linearity and model prior length-scale(equivalent to weight decay). This was proven true when I used ReLu and adjusted the L2 regularisation and dropout probability $p$ and got a somewhat desirable result with 99.3% accuracy(uncertainty plotted below). However that was more ad hocery than I’m comfortable with as techniques to ‘learn’ these hyper parameters should in theory only lead to overfitting and over-confidence(&lt;a href=&quot;https://arxiv.org/pdf/1703.01961&quot;&gt;Louizos and Welling(2017)&lt;/a&gt;). The hyperparameters(from trial and error) for the best result also contradict the fact that 0.5 for $p$ provides the most variance in weights which will translate into greater variance in the predictive distribution (&lt;a href=&quot;https://www.cs.toronto.edu/%7Ehinton/absps/JMLRdropout.pdf&quot;&gt;Srivastava et al.(2014)&lt;/a&gt;). Most of the models in use are ones that are tuned for accuracy and may not perform as well if we ask it for uncertainty estimates. Thus, its another step for the user to search for a model that not only gives good accuracy but also appropriate uncertainty estimates.&lt;/p&gt;
+&lt;p&gt;The results are slightly better than VI. A possible explanation is the absence of the mean field approximation and we may also be sampling from richer posteriors of weights. But in that case, one can expect much better results. The authors in the MC dropout paper talks about the determinants of predictive uncertainty - model structure, model prior and approximating distribution. They identify that the predictive uncertainty depends heavily on the non-linearity and model prior length-scale(equivalent to weight decay). This was proven true when I used ReLu and adjusted the L2 regularisation and dropout probability $p$ and got a somewhat desirable result with 99.3% accuracy(uncertainty plotted below). However that was more ad hocery than I’m comfortable with as techniques to ‘learn’ these hyper parameters should in theory only lead to overfitting and over-confidence(&lt;a href=&quot;https://arxiv.org/pdf/1703.01961&quot;&gt;Louizos and Welling(2017)&lt;/a&gt;). The hyperparameters(from trial and error) for the best result also contradict the fact that 0.5 for $p$ provides the most variance in weights which will translate into greater variance in the predictive distribution (&lt;a href=&quot;https://www.cs.toronto.edu/%7Ehinton/absps/JMLRdropout.pdf&quot;&gt;Srivastava et al.(2014)&lt;/a&gt;). Most of the models in use are ones that are tuned for accuracy and may not perform as well if we ask it for uncertainty estimates. Thus, its another step for the user to search for a model that not only gives good accuracy but also appropriate uncertainty estimates.&lt;/p&gt;
 
 &lt;figure&gt;&lt;center&gt;
 &lt;img src=&quot;/assets/uncertainty/MCDropB.png&quot; alt=&quot;MCDropB&quot; title=&quot;High accuracy(.99) and uncertainty&quot; /&gt;
@@ -84,7 +84,7 @@
 &lt;p&gt;Note that this is in no way a criticism of MC dropout, it’s simply pointing out gaps in my individual or our collective knowledge. Nevertheless, its also worth pointing out at an actual criticism of the method in a &lt;a href=&quot;http://bayesiandeeplearning.org/2016/papers/BDL_4.pdf&quot;&gt;note&lt;/a&gt; by Ian Osband which raises a confusion between risk and model uncertainty and posits that MC dropout is actually approximating risk which if it is the case, shouldn’t be the uncertainty we should be putting our money on. I feel that this is a valid question and it requires more research hours especially into the theoretical aspects to come to a conclusion.&lt;/p&gt;
 
 &lt;h2&gt;Coming up&lt;/h2&gt;
-&lt;p&gt;There are several other exciting methods to uncertainty estimation which includes propositions from the Bayesian paradigm such as Normalizing Flows, Hamiltonian Monte Carlo as well as frequentist methods such as bootstrap sampling, ensembles and more. I’ll update the post irregularly as I get around to exploring the related papers. Given below is a an empirical CDF of the entropy of predictive distributions as done in Louizos and Welling(2017). This should provide a good comparitive picture of the methods implemented so far. Curves that are closer to the bottom right part of the plot are preferable for nMNIST, as it denotes that the probability of observing a high confidence prediction is low and the opposite for MNIST.&lt;/p&gt;
+&lt;p&gt;There are several other exciting methods to uncertainty estimation which includes propositions from the Bayesian paradigm such as Normalizing Flows, Hamiltonian Monte Carlo as well as frequentist methods such as bootstrap sampling, ensembles and more. I’ll update the post irregularly as I get around to exploring the related papers. Given below is a an empirical CDF of the entropy of predictive distributions as done in Louizos and Welling(2017). This should provide a good comparative picture of the methods implemented so far. Curves that are closer to the bottom right part of the plot are preferable for nMNIST, as it denotes that the probability of observing a high confidence prediction is low and the opposite for MNIST.&lt;/p&gt;
 
 &lt;figure&gt;&lt;center&gt;
 &lt;img src=&quot;/assets/uncertainty/cdf.png&quot; alt=&quot;CDF&quot; title=&quot;Empirical CDF of Entropy&quot; /&gt;
@@ -117,7 +117,7 @@ computation, Knill and Pouget, 2004&lt;/a&gt;&lt;br /&gt;
         <title>Gaussian Process with PyMC3</title>
         <description>&lt;p&gt;The goal is to explore &lt;b&gt;Gaussian&lt;/b&gt; process(GP) which are &lt;b&gt;Bayesian&lt;/b&gt; &lt;b&gt;non-parametric&lt;/b&gt; models, in the context of &lt;b&gt;regression&lt;/b&gt; problems.&lt;/p&gt;
 
-&lt;p&gt;Focusing on the key terms, the easiest to tackle is regression which you may already know given that you wanted to know more about Gaussian processes. In the most simplest terms, regression is used to model and predict continuous values. In our adventure with Gaussian process, we will be working on predicting winning times for olympic events(eg. 100m dash) given an year, learning a mapping between the two.&lt;/p&gt;
+&lt;p&gt;Focusing on the key terms, the easiest to tackle is regression which you may already know given that you wanted to know more about Gaussian processes. In simple terms, regression is used to model and predict continuous values. In our adventure with Gaussian process, we will be working on predicting winning times for olympic events(eg. 100m dash) given an year, learning a mapping between the two.&lt;/p&gt;
 
 &lt;figure&gt;&lt;center&gt;
 &lt;img src=&quot;/assets/100mds.png&quot; alt=&quot;OlympicsDataset&quot; title=&quot;Olympics 100m Mens&quot; /&gt;&lt;/center&gt;
@@ -126,16 +126,16 @@ computation, Knill and Pouget, 2004&lt;/a&gt;&lt;br /&gt;
 &lt;p&gt;Please find the &lt;a href=&quot;https://github.com/shehel/Bayesian_analysis/blob/master/GP_regression.ipynb&quot;&gt;iPython notebook&lt;/a&gt; to accompany this tutorial and check out references for some excellent resources. We will be using the PyMC3 python library for probabilistic programming, i.e., implementing GP.&lt;/p&gt;
 
 &lt;h2&gt;Channeling the Bayesian&lt;/h2&gt;
-&lt;p&gt;The key idea is that all Bayesian answers to questions are desribed in probabilities. And that means, you are handed a distribution of results representing the uncertainty inherent in the problem. Ofcourse, one is free to choose the ‘best’ from this distribution but lets try to understand why thinking like a Bayesian is so natural and institutionalised .&lt;/p&gt;
+&lt;p&gt;The key idea is that all Bayesian answers to questions are described in probabilities. And that means, you are handed a distribution of results representing the uncertainty inherent in the problem. Ofcourse, one is free to choose the ‘best’ from this distribution but let’s try to understand why thinking like a Bayesian is so natural and institutionalised .&lt;/p&gt;
 
-&lt;p&gt;Imagine this, you forgot your watch and would like to know the time in hours. The only source of information is your trusty thermometer and your past experience with correlating thermometer readings to time of the day, it should be obvious that there’s no one to one mapping here - there is some uncertainty. It shows a fairly high reading and immediately you narrow down your answer. But notice that you don’t home in on a single value but a range of value weighted by your past experience - you might think its the afternoon, somewhere between 10:00 and 15:00 with a greater weighting near 12:00 because your past experience has shown you that it corresponded to high temperature readings. If the above described your thought process, congratulations! You have proved you are a bayesian and a human aka &lt;u&gt;not&lt;/u&gt; a flawless all knowing super intelligence. Thinking like a Bayesian, an individual, most likely Thomas Bayes but Richard Price and Laplace are also plausible, codified the notion of updating weightage with evidence through&lt;/p&gt;
+&lt;p&gt;Imagine this, you forgot your watch and would like to know the time in hours. The only source of information is your trusty thermometer and you experience with correlating thermometer readings to time of the day, it should be obvious that there’s no one to one mapping here - there is some uncertainty. It shows a fairly high reading and immediately you narrow down your answer. But notice that you don’t home in on a single value but a range of value weighted by your past experience - you might think its the afternoon, somewhere between 10:00 and 15:00 with a greater weighting near 12:00 because your past experience has shown you that it corresponded to high temperature readings. If the above described your thought process, congratulations! You have proved you are a bayesian and a human aka &lt;u&gt;not&lt;/u&gt; a flawless all knowing super intelligence. Thinking like a Bayesian, an individual, most likely Thomas Bayes but Richard Price and Laplace are also plausible, codified the notion of updating weightage with evidence through&lt;/p&gt;
 
 &lt;script type=&quot;math/tex; mode=display&quot;&gt;\underbrace{P(A|B)}_{Posterior} = \frac{\underbrace{P(B|A)}_{Likelihood} * \underbrace{P(B)}_{Prior} }{\underbrace{P(A)}_{Evidence/Marginal Likelihood}}&lt;/script&gt;
 
 &lt;p&gt;Our brains handle regression implicitly but computers require an explicit description of this using weight parameters over inputs, which in our case is temperatures. But you already know this, if not, head to the nearest linear regression tutorial. We are now ready to go infinite parameters.&lt;/p&gt;
 
 &lt;h2&gt;Non-parametric == infinite parameters&lt;/h2&gt;
-&lt;p&gt;If you tried to understand ‘Non-parametric’ literally, you are not alone and sorry to dissappoint. As cool as such an idea may sound, its also not a thing yet. Bayesian non-parametric methods do not imply that there are no parameters since probability distributions need parameters, but the number of parameters grow with the size of the dataset. Thus, Bayesian non-parametric models are free birds with infinite parameters.&lt;/p&gt;
+&lt;p&gt;If you tried to understand ‘Non-parametric’ literally, you are not alone and sorry to disappoint. As cool as such an idea may sound, it’s also not a thing yet. Bayesian non-parametric methods do not imply that there are no parameters since probability distributions need parameters, but the number of parameters grow with the size of the dataset. Thus, Bayesian non-parametric models are free birds with infinite parameters.&lt;/p&gt;
 
 &lt;p&gt;The parametric approach
 has an obvious problem in that we have to decide upon the freedom of the class
@@ -146,7 +146,7 @@ flexibility of the class of functions, but this runs into the danger of overfitt
 where we can obtain a good fit to the training data, but perform badly when
 making test predictions. The non-parametric approach appears to have a serious problem, in that surely
 there are an uncountably infinite set of possible functions, and how are we
-Gaussian process going to compute with this set in finite time? Lets find out.&lt;/p&gt;
+Gaussian process going to compute with this set in finite time? Let’s find out.&lt;/p&gt;
 
 &lt;h2&gt;Come get your Gaussian&lt;/h2&gt;
 
@@ -209,7 +209,7 @@ O &amp; I
 &lt;h2&gt;Gaussian Process&lt;/h2&gt;
 &lt;p&gt;Think of Gaussian process as a method that allows the data to speak for itself rather than external forces controlling the hyperparameters(complexity), which essentially allows the model to learn complex functions as more data becomes available. A Gaussian process generalizes the multivariate normal to infinite dimension. It is defined as an infinite collection of random variables, any finite subset of which have a Gaussian distribution. While a probability distribution describes random vectors, a process describes functions. Marginalisation property \ref{marginal} of Gaussians is the reason why we can go infinite. Thus, each of our datapoints are dimensions of a multivariate Gaussian. Following the logic, we can marginalize over the infinitely-many variables we are not interested in to find the value of the variable we actually need.&lt;/p&gt;
 
-&lt;p&gt;We can describe a Gaussian process as a disribution over functions. Just as a multivariate normal distribution is completely specified by a mean vector and covariance matrix, a GP is fully specified by a mean function and a covariance function:&lt;/p&gt;
+&lt;p&gt;We can describe a Gaussian process as a distribution over functions. Just as a multivariate normal distribution is completely specified by a mean vector and covariance matrix, a GP is fully specified by a mean function and a covariance function:&lt;/p&gt;
 
 &lt;script type=&quot;math/tex; mode=display&quot;&gt;p(x) \sim \mathcal{GP}(m(x), K(x,x^{\prime}))&lt;/script&gt;
 
@@ -233,12 +233,12 @@ K(x,x^{\prime}) &amp;= \theta exp( \frac{-(x_i-x_j)^2}{2l^2})
 &lt;img src=&quot;/assets/gammas.png&quot; alt=&quot;gammas&quot; title=&quot;Varying Gammas&quot; /&gt;&lt;/center&gt;
 &lt;/figure&gt;
 
-&lt;p&gt;For a finite number of points, the GP becomes a multivariate normal, with the mean and covariance as the mean functon and covariance function evaluated at those points.&lt;/p&gt;
+&lt;p&gt;For a finite number of points, the GP becomes a multivariate normal, with the mean and covariance as the mean function and covariance function evaluated at those points.&lt;/p&gt;
 
 &lt;p&gt;The behavior of individual realizations from the GP is governed by the covariance function. This function controls both the degree of shrinkage to the mean function and the smoothness of functions sampled from the GP.&lt;/p&gt;
 
 &lt;h2&gt;Distribution over Functions&lt;/h2&gt;
-&lt;p&gt;Below is a plot containing 20 &lt;u&gt;functions&lt;/u&gt; sampled from a GP. When we write a function that takes continuous values as inputs, we are essentially specifying an infinte vector that only returns values (indexed by the inputs) when the function is called upon to do so. GPs are non-parametric due to this behaviour and the nice properties of a Gaussian makes this possible. This idea may seem a bit alien and I assure you that the pieces will fall in place when we apply it to a regression problem.&lt;/p&gt;
+&lt;p&gt;Below is a plot containing 20 &lt;u&gt;functions&lt;/u&gt; sampled from a GP. When we write a function that takes continuous values as inputs, we are essentially specifying an infinite vector that only returns values (indexed by the inputs) when the function is called upon to do so. GPs are non-parametric due to this behaviour and the nice properties of a Gaussian makes this possible. This idea may seem a bit alien and I assure you that the pieces will fall in place when we apply it to a regression problem.&lt;/p&gt;
 
 &lt;figure&gt;&lt;center&gt;
 &lt;img src=&quot;/assets/gps20.png&quot; alt=&quot;sampled&quot; title=&quot;Sampling from a GP&quot; /&gt;&lt;/center&gt;
@@ -255,12 +255,12 @@ K(x,x^{\prime}) &amp;= \theta exp( \frac{-(x_i-x_j)^2}{2l^2})
 
 &lt;script type=&quot;math/tex; mode=display&quot;&gt;y = f(x) + N(0,\sigma^2)&lt;/script&gt;
 
-&lt;p&gt;The equations answers itself because remember, $f(x)$ is a gaussian and adding noise which is also a Gaussian is a trivial with normally distributed independent Gaussian variables, it is simply $\sigma^2$ added to $K$. A more nagging question is about the hyperparameters (length scale, $\sigma^2$ etc) we’ve taken for granted, how on Earth do we find them? An analytic solution is  rare because in most cases, a data generating function can’t be modelled neatly with Gaussians everywhere in a heirarchical specification of models. That brings us to the next section on inference and probabilistic programming for estimating hyperparameters.&lt;/p&gt;
+&lt;p&gt;The equations answers itself because remember, $f(x)$ is a gaussian and adding noise which is also a Gaussian is a trivial with normally distributed independent Gaussian variables, it is simply $\sigma^2$ added to $K$. A more nagging question is about the hyperparameters (length scale, $\sigma^2$ etc) we’ve taken for granted, how on Earth do we find them? An analytic solution is  rare because in most cases, a data generating function can’t be modelled neatly with Gaussians everywhere in a hierarchical specification of models. That brings us to the next section on inference and probabilistic programming for estimating hyperparameters.&lt;/p&gt;
 
 &lt;h2&gt;Inference&lt;/h2&gt;
 &lt;p&gt;We have 3 methods for finding our hyperparameters at this juncture, the more frequentist Empirical Bayes and Cross Validation or full Bayesian inference of hyperparameters with approximating techniques using PyMC3. You already know where we are headed and I do not pursue the other option here as it is kind of obsolete(imho) now that we have efficient probabilistic techniques. An added benefit is that we can go over the wonderful Occam’s Razor property of Bayesian Models.&lt;/p&gt;
 
-&lt;p&gt;We have a dataset of Olympics mens 100m winning times for the past century and would like to infer a patters through fitting a GP. Given below is the result.&lt;/p&gt;
+&lt;p&gt;We have a dataset of Olympics mens 100m winning times for the past century and would like to infer a pattern through fitting a GP. Given below is the result.&lt;/p&gt;
 
 &lt;figure&gt;&lt;center&gt;
 &lt;img src=&quot;/assets/100mgp.png&quot; alt=&quot;OlympicsDatasetGP&quot; title=&quot;Olympics 100m Mens Posterior&quot; /&gt;&lt;/center&gt;
@@ -285,9 +285,9 @@ $$p(\mathcal{M}|y) = \frac{p(y|\mathcal{M}p(\mathcal{M}))}{p(y)}$$
 &lt;p&gt;This can all be done with PyMCs &lt;code class=&quot;highlighter-rouge&quot;&gt;gp.marginal_likelihood&lt;/code&gt; method. We can get the predictive posterior by conditioning the new dataset on observed data by using &lt;code class=&quot;highlighter-rouge&quot;&gt;gp.conditional&lt;/code&gt; which we have covered already. There is also a &lt;code class=&quot;highlighter-rouge&quot;&gt;gp.predict&lt;/code&gt; method that takes in data and computes the $y$s given a point.&lt;/p&gt;
 
 &lt;h2&gt;Model Design&lt;/h2&gt;
-&lt;p&gt;The effectiveness of a GP and similarly, the appropriateness of the functions it realizes completely lies with the choice of the covariance kernel. Fortunately, PyMC3 includes a large library of covariance functions to choose from. Furthermore, you can also combine covariance functions to model heterogenous data or even come up with a new shiny kernel of your own.&lt;/p&gt;
+&lt;p&gt;The effectiveness of a GP and similarly, the appropriateness of the functions it realizes completely lies with the choice of the covariance kernel. Fortunately, PyMC3 includes a large library of covariance functions to choose from. Furthermore, you can also combine covariance functions to model heterogeneous data or even come up with a new shiny kernel of your own.&lt;/p&gt;
 
-&lt;p&gt;We also have a major constraint with GPs in that it requires the inversion of $K$ when calculating the posterior. This quickly becomes unscaleable when fitting large datasets. A reasonable workaround is building a sparse approximation of the covariance matrix by not creating a full covariance matrix over all $n$ training inputs. This method brings down the complexity from $\mathcal{O}(n^3)$ to $\mathcal{O}(nm^2)$ where $m&amp;lt;n$. Although sparse approximation may reduce the expressiveness of the GP, clever choice of $m$ can potentially rectify this. PyMC has &lt;code class=&quot;highlighter-rouge&quot;&gt;gp.MarginalSparse&lt;/code&gt; that implements sparse approximation for which there’s an example in the accompanying notebook. However, this is an interesting field to follow up on.&lt;/p&gt;
+&lt;p&gt;We also have a major constraint with GPs in that it requires the inversion of $K$ when calculating the posterior. This quickly becomes unscalable when fitting large datasets. A reasonable workaround is building a sparse approximation of the covariance matrix by not creating a full covariance matrix over all $n$ training inputs. This method brings down the complexity from $\mathcal{O}(n^3)$ to $\mathcal{O}(nm^2)$ where $m&amp;lt;n$. Although sparse approximation may reduce the expressiveness of the GP, clever choice of $m$ can potentially rectify this. PyMC has &lt;code class=&quot;highlighter-rouge&quot;&gt;gp.MarginalSparse&lt;/code&gt; that implements sparse approximation for which there’s an example in the accompanying notebook. However, this is an interesting field to follow up on.&lt;/p&gt;
 
 &lt;p&gt;PyMC also provides a &lt;code class=&quot;highlighter-rouge&quot;&gt;gp.Latent&lt;/code&gt; method that has a more general implementation of a GP. You can relax the assumption that the data is normally distributed and work with other distributions. But I couldn’t think of a problem where this would work better than regular GPs.&lt;/p&gt;
 
@@ -352,7 +352,7 @@ An issue with marginalizing a joint is that it quickly becomes intractable, i.e.
 &lt;p&gt;Factorization can be verbosely represented through factor graphs because it makes it explicit by adding additional nodes for factors.&lt;/p&gt;
 &lt;div style=&quot;example&quot;&gt;
 	&lt;pre&gt;
-A factor graph is a bipartite graph that expresses the structure&lt;br /&gt;of the factorization.A factor graph has a variable node for each variable $x_i$,&lt;br /&gt;a factor node for each local function $f_s$, and an edge-connecting variable node&lt;br /&gt;$x_i$ to factor node $f_s$ if and only if $x_i$ is an argument of $f_s$.
+A factor graph is a bipartite graph that expresses the structure&lt;br /&gt;of the factorization. A factor graph has a variable node for each variable $x_i$,&lt;br /&gt;a factor node for each local function $f_s$, and an edge-connecting variable node&lt;br /&gt;$x_i$ to factor node $f_s$ if and only if $x_i$ is an argument of $f_s$.
 	&lt;/pre&gt;
 &lt;/div&gt;
 &lt;p&gt;An example factorization and its corresponding graph is given below.&lt;/p&gt;

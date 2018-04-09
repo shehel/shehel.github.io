@@ -31,7 +31,7 @@ where
 Factorization can be verbosely represented through factor graphs because it makes it explicit by adding additional nodes for factors. 
 <div style="example">
 	<pre>
-A factor graph is a bipartite graph that expresses the structure<br>of the factorization.A factor graph has a variable node for each variable $x_i$,<br>a factor node for each local function $f_s$, and an edge-connecting variable node<br>$x_i$ to factor node $f_s$ if and only if $x_i$ is an argument of $f_s$.
+A factor graph is a bipartite graph that expresses the structure<br>of the factorization. A factor graph has a variable node for each variable $x_i$,<br>a factor node for each local function $f_s$, and an edge-connecting variable node<br>$x_i$ to factor node $f_s$ if and only if $x_i$ is an argument of $f_s$.
 	</pre>
 </div>
  An example factorization and its corresponding graph is given below.
