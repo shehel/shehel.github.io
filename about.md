@@ -6,14 +6,5 @@ permalink: /about/
 
 <h2>Hello!</h2>
 
-Computer Science graduate with an interest in NLP and Bayesian methods. Hoping to apply these to improve knowledge access and transfer some day.  
-
-Trying to understand this Strange Loop  
-<div class="example">
-    <pre>
-while alive:
-  prior = posterior(xp, prior)
-  xp = sense()
-    </pre>
-</div>
+Computer Science graduate with an interest in NLP, Neural Networks and Bayesian methods. Hoping to apply these to create intelligent tools that benefit society some day.
 
