@@ -3,6 +3,31 @@ layout: page
 title : Projects
 permalink: /projects/
 ---
+<p>All projects below are available in the github <a href="https://github.com/shehel/">repo</a>
+<div class="manual-post">
+  <div class="manual manual-title">
+  <strong>Covid19 Modeling</strong>
+  </div>
+<img src="covid.png" alt="covid19" title="Covid19 Plot" style="width:480px;height:210px;"/>
+<p>  <div class="manual-content">
+Modeling Covid19 in Qatar by inferring an exetended SIR model's parameters using MCMC. Also models present and past reproduction rate. Project was <a href="covid19-qatar.herokuapp.com">deployed</a> as a web-app using heroku. 
+  </div>
+</p>
+</div>
+<br>
+
+<div class="manual-post">
+  <div class="manual manual-title">
+  <strong>Propaganda Detection</strong>
+  </div>
+<img src="propaganda.png" alt="propaganda" title="Propaganda Detection" style="width:480px;height:210px;"/>
+<p>  <div class="manual-content">
+Word-level propaganda detection using fine-tuned BERT language model. Published in <a href="https://www.aclweb.org/anthology/D19-5011.pdf">NLP4IF 2019</a>. 
+  </div>
+</p>
+</div>
+<br>
+
 <div class="manual-post">
   <div class="manual manual-title">
   <strong>Attention Sequence to Sequence</strong>
