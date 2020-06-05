@@ -7,6 +7,8 @@ permalink: /about/
 <h2>Hello!</h2>
 
 Computer Science post-grad interested in the scientific and engineering challenges involved in understanding/replicating intelligence.
+PhD candidate in HBKU, Qatar.
+Get in touch via shehel@live.com.
 
 
 
