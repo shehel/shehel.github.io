@@ -5,8 +5,15 @@ permalink: /projects/
 ---
 <div class="manual-post">
   <div class="manual manual-title">
-  Code available in the github <a href="https://github.com/shehel/">repo</a>
+  
+<div class="manual-post">
+ <p>  <div class="manual-content">
+Code available in the github <a href="https://github.com/shehel/">repo</a>
   </div>
+</p>
+</div>
+<br>
+
 <div class="manual-post">
   <div class="manual manual-title">
   <strong>Covid19 Modeling</strong>
