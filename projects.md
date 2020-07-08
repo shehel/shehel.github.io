@@ -3,7 +3,10 @@ layout: page
 title : Projects
 permalink: /projects/
 ---
-<h3>All projects below are available in the github <a href="https://github.com/shehel/">repo</a></h3>
+<div class="manual-post">
+  <div class="manual manual-title">
+  Code available in the github <a href="https://github.com/shehel/">repo</a>
+  </div>
 <div class="manual-post">
   <div class="manual manual-title">
   <strong>Covid19 Modeling</strong>
