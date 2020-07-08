@@ -4,9 +4,6 @@ title : Projects
 permalink: /projects/
 ---
 <div class="manual-post">
-  <div class="manual manual-title">
-  
-<div class="manual-post">
  <p>  <div class="manual-content">
 Code available in the github <a href="https://github.com/shehel/">repo</a>
   </div>
